@@ -24,25 +24,18 @@ if ~size(raw_data,2) > size(raw_data,1)
     end
 end
 
-%% --------------------------------- STEP 0 --------------------------------- %%
+%% --------------------------------- STEP 0 - VARIABLE INITIALIZATION   --------------------------------- %%
 % Create a channel log-file. This will be a logical array where 1
 % will denote a good channel and 0 will denote a bad channel.
-% Initialize variable to hold the filtered data
-channels = size(raw_data,1);
-% Get the duration of the recording
-duration = size(raw_data,2);
-
-filtered_data = zeros(channels-1,duration);
 % Initialize a logical array where we assume all channels to be
 % good
 allchannels = true(channels-1,1);
-
-
-
-%% --------------------------------- STEP 1 --------------------------------- %
-% Removal of channels based on the variance of the raw power.
-%   This step will track all the channels where the broadband
-%   signal exceeds an upper and lower threshold of variance.
+%% --------------------------------- STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
+filtered_data =  filter_linenoise(raw_data, params);
+%% --------------------------------- STEP 2 - VARIANCE THRESHOLDING      --------------------------------- %%
+%    Removal of channels based on the variance of the raw power.
+%    This step will track all the channels where the broadband
+%    signal exceeds an upper and lower threshold of variance.
 
 % Get the variance of all channels
 disp([newline 'Detecting the variance of all channels'])
