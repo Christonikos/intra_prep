@@ -38,14 +38,14 @@ recID                   = P.recordingmethod{1};
 datatypeID              = P.datatype{1};
 %% -----------  BRANCH 3 - LOAD THE RAW DATA ----------- %
 % load the raw data : matrix of dimensions : [channels x time]. 
-[raw_data, ~] = load_raw_data(settings, P, datatypeID, recID, hopid);
+[raw_data, ~, labels]   = load_raw_data(settings, P, datatypeID, recID, hopID);
 %% -----------  BRANCH 4 - MAIN  CHANNEL REJECTION ANALYSIS----------- %
 % Memory pre-allocation
-clean_data       = zeros(size(raw_data,1),size(raw_data,2)); 
+clean_data              = zeros(size(raw_data,1),size(raw_data,2)); 
 % function handle to the main function.
-[clean_data, indexofcleandata ] = ...
-    m(P, settings, raw_data{recording }, params, labels, gyri, hopID, recording, recordings);
-clear raw_data
+m = @mainPreProcessing;
+[clean_data, indexofcleandata] = m(P, settings, raw_data{recording }, params, labels, gyri);
+
 
 
 

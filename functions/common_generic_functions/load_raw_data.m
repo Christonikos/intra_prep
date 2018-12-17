@@ -21,21 +21,22 @@
 %
 %           		2. channels         : Double  -   Number of channels used in the current raw file.
 %
-%                  
+%                   3. labels           : String  -   Channel labels
+%                                                     provided by the recording system. 
 % ---------------------------------------------------------------------------------------------------------------
-function [raw_data, channels] = load_raw_data(settings, P, datatypeID, recMethod, hopid)
+function [raw_data, channels, labels] = load_raw_data(settings, P, datatypeID, recMethod, hopid)
 switch datatypeID
     case 'Blackrock'
         %% --------- LOAD THE RAW BLACKROCK DATA --------- %%
-        openNSx(fullfile(join([settings.path2rawdata,filesep,P.rawfilename])))
-        % Display information to the user
-        disp([newline '---------- Loading raw data -------------' ...
+                % Display information to the user
+        disp([newline '---------- Loading the raw data -------------' ...
             newline newline ...
             'Patient            : ' settings.patient '.' newline ...
             'Hospital           : ' hopid newline ...
             'Recording method   : ' num2str(recMethod) newline ...
             'Datatype           : ' datatypeID newline ...
             newline   '-----------------------------------------'])
+        openNSx(fullfile(join([settings.path2rawdata,filesep,P.rawfilename])))
         % list the output that Blackrock provides
         files       = NS3.Data;
         files_len   = length(files);
@@ -48,4 +49,5 @@ switch datatypeID
                 end
         end
         channels = size(raw_data,1);
+        labels   = vertcat(NS3.ElectrodesInfo.Label);
 end
