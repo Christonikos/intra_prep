@@ -38,7 +38,7 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                       the indices of the rejected channels per step (see
 %                                                       output 1).
 %
-% Written by : Christos-Nikoalaos Zacharopoulos, @UNICOG 2018.
+% Written by : Christos Nikolaos Zacharopoulos, @UNICOG 2018.
 % ------------------------------------------------------------------------------------------------------------------%
 % Keep the workspace clean.
 clearvars -except P settings raw_data params labels 

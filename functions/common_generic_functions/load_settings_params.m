@@ -82,7 +82,7 @@ switch hopid
         checkField(P,'spikingthreshold',80);        % spiking threshold
         checkField(P,'rereference','bipolar');      % commonaverage, clinical
         checkField(P,'vizualization',true);         %'slow'/'quick'.
-        checkField(P,'hfo_detection','false');
+        checkField(P,'hfo_detection',false);
         checkField(P,'rawfilename','TS096_NeuroSyntax2_sEEG_files_a/20170606-111436-001.ns3')
         
         % -------------------- APPENDIX -------------------- %
