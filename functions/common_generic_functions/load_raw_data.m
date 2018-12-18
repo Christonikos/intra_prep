@@ -24,7 +24,9 @@
 %                   3. labels           : String  -   Channel labels
 %                                                     provided by the recording system. 
 % ---------------------------------------------------------------------------------------------------------------
-function [raw_data, channels, labels] = load_raw_data(settings, P, datatypeID, recMethod, hopid)
+function [raw_data, channels, labels] = load_raw_data(settings, P)
+recID                   = P.recordingmethod{1};
+datatypeID              = P.datatype{1};
 switch datatypeID
     case 'Blackrock'
         %% --------- LOAD THE RAW BLACKROCK DATA --------- %%
