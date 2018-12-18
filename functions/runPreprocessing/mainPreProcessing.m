@@ -17,7 +17,7 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                   @load_settings_params.m
 %
 %   OUTPUTS : 
-%                       1. filtered_data     :  Matrix - Data in format [channels x time]. Rejection of channels based on : 
+%                       1. filtered_data     : Matrix - Data in format [channels x time]. Rejection of channels based on : 
 %                                                       a.  Variance thresholding.
 %
 %                                                       b.  Pathological spike detection.
@@ -30,7 +30,7 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                       channels are linearly de-trended, downsampled to 1KHz and notch
 %                                                       filtered for line noise and harmonics.
 %
-%                        2. indexofcleandata :  Logical array - [channels x 1]. 
+%                        2. indexofcleandata : Logical array - [channels x 1]. 
 %                                                               1 == non rejected channel 
 %                                                               0 == rejected channel 
 %
@@ -70,7 +70,7 @@ channel_index                   =   true(size(raw_data,1),1);
 %%  --------------------------------- STEP 3 - SPIKES DETECTION          ---------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, labels, channel_index, P, params);
+[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, labels, channel_index, P, params, settings);
 %%  ---------------------------- STEP 4 - REJECTION BASED ON FREQUENCY CONTENT ----------------------------- %%
 [filtered_data, channel_index, rejected_on_step_4]  =   rejection_based_on_powerspectrum(filtered_data, labels, channel_index, params);
 

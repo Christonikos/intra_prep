@@ -1,4 +1,4 @@
-function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, labels, allchannels, P, params)
+function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, labels, allchannels, P, params, settings)
 
 % Provide feedback to the user.
 disp([newline...
