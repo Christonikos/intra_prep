@@ -37,7 +37,7 @@ P = parsePairs(varargin);
 %% -----------  BRANCH 4 - MAIN  CHANNEL REJECTION ANALYSIS----------- %
 % function handle to the main function.
 m = @mainPreProcessing;
-[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels);
+[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels, settings);
 
 
 

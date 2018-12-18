@@ -1,4 +1,4 @@
-function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels)
+function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels, settings)
 % This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
