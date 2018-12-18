@@ -44,7 +44,7 @@ datatypeID              = P.datatype{1};
 clean_data              = zeros(size(raw_data,1),size(raw_data,2)); 
 % function handle to the main function.
 m = @mainPreProcessing;
-[clean_data, indexofcleandata] = m(P, settings, raw_data{recording }, params, labels, gyri);
+[clean_data, indexofcleandata] = m(P, settings, raw_data, params, labels);
 
 
 

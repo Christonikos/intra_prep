@@ -3,7 +3,7 @@
 % Written by : Christos-Nikolaos Zacharopoulos (christonik@gmail.com)
 % @UNICOG, 2018
 %
-%    INPUTS:
+%   INPUTS:
 %                   1. settings         : Struct  -   Holds the paths to
 %                                                   various locations such as the data directory etc.
 %
@@ -16,7 +16,7 @@
 %
 %                   5. hopID            : String  -   This is the hospital ID, specified at the beginning of each run function.
 %
-%  OUTPUTS :
+%   OUTPUTS :
 %                   1. raw_data         : Matrix  -   Dimensions [Channels x time]
 %
 %           		2. channels         : Double  -   Number of channels used in the current raw file.
@@ -28,7 +28,7 @@ function [raw_data, channels, labels] = load_raw_data(settings, P, datatypeID, r
 switch datatypeID
     case 'Blackrock'
         %% --------- LOAD THE RAW BLACKROCK DATA --------- %%
-                % Display information to the user
+        % Provide information to the user
         disp([newline '---------- Loading the raw data -------------' ...
             newline newline ...
             'Patient            : ' settings.patient '.' newline ...

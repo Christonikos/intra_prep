@@ -1,4 +1,4 @@
-function [signal , indexofcleandata, rejectedchannels, pathological_event] = mainPreProcessing(P,settings,raw_data,params, labels, gyri)
+function [signal , indexofcleandata, rejectedchannels, pathological_event] = mainPreProcessing(P, settings, raw_data, params, labels)
 % This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %    INPUTS :   1. raw_data : data in format [channels x time]. Within the UNICOG pipeline, this
@@ -11,264 +11,40 @@ function [signal , indexofcleandata, rejectedchannels, pathological_event] = mai
 %                      4.gyri           : Hospital-specific corregistration  of the electrodes to an anatomical atlas.
 %                      5.hopID       : The ID of the Hospital currently under consideration.
 % Written by : Christos-Nikoalaos Zacharopoulos, @UNICOG 2018.
+% ------------------------------------------------------------------------------------------------------------------%
 
 % Keep the workspace clean.
-clearvars -except P settings raw_data params labels gyri hopID recording recordings
+clearvars -except P settings raw_data params labels 
 % Input checks :
 if ~size(raw_data,2) > size(raw_data,1)
     try
         raw_data = raw_data';
-    catch ('Out of memory');
+    catch 
         disp([newline 'Please transpose your input data before continuing'])
         return;
     end
 end
-
 %% --------------------------------- STEP 0 - VARIABLE INITIALIZATION   --------------------------------- %%
 % Create a channel log-file. This will be a logical array where 1
 % will denote a good channel and 0 will denote a bad channel.
 % Initialize a logical array where we assume all channels to be
 % good
-allchannels = true(channels-1,1);
+allchannels = true(size(raw_data,1),1);
 %% --------------------------------- STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
 filtered_data =  filter_linenoise(raw_data, params);
 %% --------------------------------- STEP 2 - VARIANCE THRESHOLDING      --------------------------------- %%
 %    Removal of channels based on the variance of the raw power.
 %    This step will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-
-% Get the variance of all channels
-disp([newline 'Detecting the variance of all channels'])
-
-% This is the first hot-spot in terms of memory consumption (might
-% lead to OUT OF MEMORY ERROR
-try
-    dataVariance = var(filtered_data');
-    switch P.processing
-        case 'slow'
-            figureDim = [0 0 1 1];
-            figure('units', 'normalized', 'outerposition', figureDim)
-            subplot(211)
-            bar(dataVariance)
-            grid on
-            grid minor
-            xlabel('channels')
-            ylabel('detected variance')
-            title('Detected variance for all channels')
-            hold on
-            plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-            hold on
-            plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-            legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-            
-            subplot(212)
-            bar(dataVariance)
-            grid on
-            grid minor
-            xlabel('channels')
-            ylabel('detected variance')
-            title('Detected variance for all channels')
-            xlim([0 20])
-            hold on
-            plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-            hold on
-            plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-            legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-            pause(5)
-            close all
-    end
-catch ('Out of memory. Type HELP MEMORY for your options');
-    disp(['The available RAM limit has been reached. ' newline ...
-        'Trying to calculate the variance for each channel manually.'])
-    % Pre-allocate the variance variable
-    dataVariance = zeros(1,size(filtered_data,1));
-    for channel = 1: size(filtered_data,1)
-        dataVariance(1,channel) = var(filtered_data(channel,:)');
-    end
-    disp(['The calculation has been completed'])
-    switch P.processing
-        case 'slow'
-            figureDim = [0 0 1 1];
-            figure('units', 'normalized', 'outerposition', figureDim)
-            subplot(211)
-            bar(dataVariance)
-            grid on
-            grid minor
-            xlabel('channels')
-            ylabel('detected variance')
-            title('Detected variance for all channels')
-            hold on
-            plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-            hold on
-            plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-            legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-            
-            subplot(212)
-            bar(dataVariance)
-            grid on
-            grid minor
-            xlabel('channels')
-            ylabel('detected variance')
-            title('Detected variance for all channels')
-            xlim([0 20])
-            hold on
-            plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-            hold on
-            plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-            legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-            pause(5)
-            close all
-    end
-end
-
-
-% Set the cutting threshold
-medianthreshold = P.medianthreshold;
-% Detect those channels that exceed 5 times the median of the
-% detected variance (in both directions) - the median is not affected by the outliers
-% and thus is a better measure compared to the mean here.
-spottedChannels_positive = find(dataVariance > (medianthreshold * median(dataVariance)));
-spottedChannels_negative = find(dataVariance < (median(dataVariance)/medianthreshold));
-% Provide the first feedback on the channels that have been removed
-labels = string(labels);
-% Concatenate the detected channels
-spottedChannels = sort([spottedChannels_negative spottedChannels_positive]);
-clc;
-disp([ 'In total ' num2str(length(spottedChannels)) ...
-    ' have been removed based on the variance of the all channels.'...
-    newline ' The channels have the following labels : '  newline])
-disp([ labels(spottedChannels)])
-disp([newline 'and are located in the following regions : '])
-disp(gyri(spottedChannels))
-
-% Update the logical channel variable
-allchannels(spottedChannels') = false;
-
-
-switch P.processing
-    case 'slow'
-        % Plot the bad channels
-        figureDim = [0 0 1 1];
-        figure('units', 'normalized', 'outerposition', figureDim)
-        for bch = 1:length(spottedChannels)
-            if bch == 1
-                t = text(0.5,0.5,'These are the channels rejected from step 1');
-                t.BackgroundColor = 'k';
-                t.Color = 'w';
-                t.FontSize = 25;
-                t.FontWeight = 'Bold';
-                t.FontSmoothing = 'on';
-                t.Clipping = 'on';
-                t.HorizontalAlignment = 'center';
-                axis off;
-                pause(3)
-            end
-            plot(zscore(filtered_data(spottedChannels(bch),:)))
-            title(['Label : ' labels(spottedChannels(bch))...
-                'Location : ' gyri(spottedChannels(bch)) ...
-                'Channel Index : ' ...
-                num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
-            xlabel('Time [samples]')
-            ylabel('zscore')
-            grid on
-            grid minor
-            legend(['Channel ' num2str(bch) '/' num2str(length(spottedChannels)) newline '' ] ...
-                ,'Location','northeastoutside')
-            pause(5)
-        end
-        close all
-end
-
-
-
-%%  --------------------------------- STEP 2 --------------------------------- %
-% Remove channels based on the spikes in the raw signal
-
-% Detect abnormalities (spikes) in the raw signal. Here, we
-% basically detect rapid changes in the signal (jumps).
-
-% Provide feedback to the user.
-disp([newline...
-    '---------------- Intiating Stage 2 of the analysis ---------------- ' ...
-    newline ...
-    '(Rejection of channels based on detected spikes)'...
-    newline newline ...
-    'Epoch ' num2str(epoch) '/' num2str(nE)])
-
-% Set a threshold (in mV)
-jump_threshold = P.spikingthreshold;
-
+[filtered_data, allchannels] = variance_thresholding(filtered_data, labels, allchannels, P);
 % Set the rejected channels to NaNs
 filtered_data(find(~allchannels),:) = NaN;
-% Initialize variable to hold the channels that will be rejected
-% due to spiking activity
-nr_jumps = zeros(channels,1);
+%%  --------------------------------- STEP 3 - SPIKES DETECTION          --------------------------------- %%
+% Remove channels based on the spikes in the raw signal
+% Detect abnormalities (spikes) in the raw signal. Here, we
+% basically detect rapid changes in the signal (jumps).
+[filtered_data, allchannels] = spike_detection(filtered_data, labels, allchannels, P, params);
 
-textprogressbar([newline 'Detecting spiking channels.' newline])
-timecount = linspace(1,100,size(filtered_data,1));
-close all;
-% Loop through the channels and detect abrupt changes
-for chID = 1:size(filtered_data,1)
-    textprogressbar(timecount(chID))
-    nr_jumps(chID) = length(find(diff(filtered_data(chID,:)) > jump_threshold));
-end
-textprogressbar([newline 'Detection completed.'])
-
-switch P.processing
-    case 'slow'
-        % Plot the spike-plot
-        figureDim = [0 0 1 1];
-        f = figure('units', 'normalized', 'outerposition', figureDim);
-        bar(nr_jumps)
-        title('Spiking Channels')
-        xlabel('Channels')
-        ylabel('Number of Spikes deteted')
-        grid on
-        grid minor
-        pause(5)
-        
-        file_name = ['SpikingChannels_', settings.patient , '.png'];
-        saveas(f, fullfile(settings.path2figures, file_name), 'png')
-        close(f)
-end
-
-% Only keep voltage jumps that exceed the average fluctuation
-average_fluctuation = floor(duration/params.srate);
-exceeding_channels = find(nr_jumps > average_fluctuation);
-
-switch P.processing
-    case 'slow'
-        % Plot the spike-plot
-        figureDim = [0 0 1 1];
-        f = figure('units', 'normalized', 'outerposition', figureDim);
-        for spikeCh = 1:length(exceeding_channels)
-            plot(zscore(filtered_data(exceeding_channels(spikeCh),:)))
-            title(['Label : ' labels(exceeding_channels(spikeCh))...
-                'Location : ' gyri(exceeding_channels(spikeCh)) 'Channel Index : ' ...
-                num2str(exceeding_channels(spikeCh))],'Interpreter','none')
-            xlabel('time [samples]')
-            ylabel('z-score')
-            legend(['Channel ' num2str(spikeCh) '/' num2str(length(exceeding_channels)) newline '' ] ...
-                ,'Location','northeastoutside')
-            grid on
-            grid minor
-            pause(5)
-        end
-        close(f)
-end
-
-disp(['In total ' num2str(length(exceeding_channels)) ...
-    ' have been removed due to spiking activity.'...
-    newline ' The channels have the following labels : '  ])
-disp(labels(exceeding_channels))
-disp('and are located in the following regions : ')
-disp(gyri(exceeding_channels))
-clear textprogressbar
-
-% Update the logical channel variable and remove the trigger channel
-allchannels(exceeding_channels) = false;
-% Set the rejected channels to NaNs
-filtered_data(exceeding_channels,:) = NaN;
 
 % Provide a summary from step 1 and 2 to the user :
 disp([newline newline 'So far,  ' num2str(length(find(~allchannels))) ...
