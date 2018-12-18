@@ -29,16 +29,16 @@ addpath(genpath(fullfile(pwd,'functions')));
 % In this branch we manunally add the list of patients that corresponds to each
 % individual project.
 P = parsePairs(varargin);
-checkField(P,'Hospital',{'Houston'});
+%checkField(P,'Hospital',{'Houston'});
 % get the hospital-ID
 hopID = P.Hospital{1};
 % load settings and parameters
-[settings, params, P]   = load_settings_params(hard_drive_path, hopID,P);
-recID                   = P.recordingmethod{1};
-datatypeID              = P.datatype{1};
+[settings, params, P]   = load_settings_params(hard_drive_path, P);
+%recID                   = P.recordingmethod{1};
+%datatypeID              = P.datatype{1};
 %% -----------  BRANCH 3 - LOAD THE RAW DATA ----------- %
 % load the raw data : matrix of dimensions : [channels x time]. 
-[raw_data, ~, labels]   = load_raw_data(settings, P, datatypeID, recID, hopID);
+[raw_data, ~, labels]   = load_raw_data(settings, P);
 %% -----------  BRANCH 4 - MAIN  CHANNEL REJECTION ANALYSIS----------- %
 % Memory pre-allocation
 clean_data              = zeros(size(raw_data,1),size(raw_data,2)); 

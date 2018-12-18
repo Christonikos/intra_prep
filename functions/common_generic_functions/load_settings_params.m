@@ -1,4 +1,4 @@
-function [settings, params, P] = load_settings_params(hard_drive_path, hopid, P)
+function [settings, params, P] = load_settings_params(hard_drive_path, P)
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
 %       INPUTS  :
@@ -44,6 +44,10 @@ function [settings, params, P] = load_settings_params(hard_drive_path, hopid, P)
 % --------------------------------------------------------------------------------------------------------
 
 %------------------- HOSPITAL - CHOSEN IN THE RUN FUNCTION -------------------%
+checkField(P,'Hospital',{'Houston'});
+% get the hospital-ID
+hopID = P.Hospital{1};
+
 switch hopid
     case 'Houston'
         % -------- Patients -------- %
