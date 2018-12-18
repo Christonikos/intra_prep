@@ -1,4 +1,4 @@
-function [filtered_data, allchannels] = variance_thresholding(filtered_data, labels, allchannels, P)
+function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, allchannels, P)
 
 % Get the variance of all channels
 disp([newline 'Detecting the variance of all channels'])
@@ -8,8 +8,8 @@ for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
 disp(['The calculation has been completed'])
-switch P.processing
-    case 'slow'
+switch P.vizualization
+    case true
         figureDim = [0 0 1 1];
         figure('units', 'normalized', 'outerposition', figureDim)
         subplot(211)
@@ -62,8 +62,8 @@ disp([ labels(spottedChannels)])
 % Update the logical channel variable
 allchannels(spottedChannels') = false;
 
-switch P.processing
-    case 'slow'
+switch vizualization
+    case true
         % Plot the bad channels
         figureDim = [0 0 1 1];
         figure('units', 'normalized', 'outerposition', figureDim)
@@ -94,3 +94,10 @@ switch P.processing
         end
         close all
 end
+
+
+% Set the rejected channels to NaNs
+filtered_data(~allchannels,:) =   NaN;
+rejected_on_step_2              =   spottedChannels';
+
+

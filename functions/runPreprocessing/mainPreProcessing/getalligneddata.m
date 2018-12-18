@@ -7,6 +7,7 @@ function [alligned,allignedIndex,K] = getalligneddata(data,index,range,artifact)
 % channels
 % alligned data: last dimension is always T and first dimesion is depend on
 % the range, other dimenstions are same as input data
+% Written by Su Liu
 % Modified by : christonik@gmail.com
 %%
 if nargin<4

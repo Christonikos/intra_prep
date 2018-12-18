@@ -1,6 +1,6 @@
 # intracranial_preprocessing
 
-This is a pre-processing pipeline for intracranial data. It gets as input a raw recording file, either from BlackRock or Neuralynx, and run the following steps (see methods for details):
+This is a pre-processing pipeline for intracranial data. It gets as input a raw recording file, either from BlackRock or Neuralynx, and runs the following steps (see methods for details):
 1. notch filtering
 2. detrending
 3. automatic pathological spikes detection 

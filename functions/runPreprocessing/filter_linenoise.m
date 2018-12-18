@@ -1,4 +1,4 @@
-function filtered_data =  filter_linenoise(raw_data, params)
+function [filtered_data, params] =  filter_linenoise(raw_data, params)
 % Provide feedback to the user.
 clc;
 disp([newline...
@@ -19,13 +19,13 @@ clear textprogressbar
 textprogressbar([newline 'Removing line noise and harmonics from all channels : ']);
 % Filter the line noise and the harmonics
 for channel = 1:(channels)
-    % Do not include the trigger channel
     textprogressbar(timecount(channel));
     % Downsample the data to 1kHz
     wave    = downsample(raw_data(channel,:),1,0);
     [wave]  = notch(wave, params.srate, params.first_harmonic{1}, params.first_harmonic{2},1);
-    [wave]  = notch(wave, params.srate, params.second_harmonic{1},params.second_harmonic{2},1);   % Second harmonic of 60
-    [wave]  = notch(wave, params.srate, params.third_harmonic{1},params.third_harmonic{2},1);     % Third harmonic of 60
+    [wave]  = notch(wave, params.srate, params.first_sub_harmonic{1}, params.first_sub_harmonic{2},1);  % First sub-harmonic of 60 or 50
+    [wave]  = notch(wave, params.srate, params.second_harmonic{1},params.second_harmonic{2},1);         % Second harmonic of 60 or 50
+    [wave]  = notch(wave, params.srate, params.third_harmonic{1},params.third_harmonic{2},1);           % Third harmonic of 60 or 50
     filtered_data(channel,:) = wave;
 end
 % At this point, we have filtered, and downsampled  the raw
