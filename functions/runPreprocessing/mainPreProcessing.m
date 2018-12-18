@@ -17,22 +17,26 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                   @load_settings_params.m
 %
 %   OUTPUTS : 
-%                       1. filtered_data : Matrix - Data in format
-%                                                   [channels x time]. Rejection of channels based on : 
-%                                                       a. Variance
-%                                                       thresholding. 
-%                                                       b. Pathological
-%                                                       spike detection. 
-%                                                       c. Deviation on the
-%                                                       Power-spectrum. 
-%                                                       d. (Optional) HFOs
-%                                                       detection.
-%                                                   The rejected channels are replaced with NaNs. 
-%                                                   The non-rejected
-%                                                   channels are linearly
-%                                                   de-trended,
-%                                                   downsampled and notch
-%                                                   filtered.
+%                       1. filtered_data     :  Matrix - Data in format [channels x time]. Rejection of channels based on : 
+%                                                       a.  Variance thresholding.
+%
+%                                                       b.  Pathological spike detection.
+%
+%                                                       c.  Deviation on the Power-spectrum.
+%
+%                                                       d. (Optional) HFOs detection.
+%
+%                                                       The rejected channels are replaced with NaNs. The non-rejected
+%                                                       channels are linearly de-trended, downsampled to 1KHz and notch
+%                                                       filtered for line noise and harmonics.
+%
+%                        2. indexofcleandata :  Logical array - [channels x 1]. 
+%                                                               1 == non rejected channel 
+%                                                               0 == rejected channel 
+%
+%                        3. rejectedchannels : Struct - Each field contains
+%                                                       the indices of the rejected channels per step (see
+%                                                       output 1).
 %
 % Written by : Christos-Nikoalaos Zacharopoulos, @UNICOG 2018.
 % ------------------------------------------------------------------------------------------------------------------%

@@ -35,11 +35,9 @@ P = parsePairs(varargin);
 % load the raw data : matrix of dimensions : [channels x time]. 
 [raw_data, ~, labels]   = load_raw_data(settings, P);
 %% -----------  BRANCH 4 - MAIN  CHANNEL REJECTION ANALYSIS----------- %
-% Memory pre-allocation
-clean_data              = zeros(size(raw_data,1),size(raw_data,2)); 
 % function handle to the main function.
 m = @mainPreProcessing;
-[clean_data, indexofcleandata] = m(P, settings, raw_data, params, labels);
+[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels);
 
 
 

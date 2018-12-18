@@ -62,7 +62,7 @@ disp([ labels(spottedChannels)])
 % Update the logical channel variable
 allchannels(spottedChannels') = false;
 
-switch vizualization
+switch P.vizualization
     case true
         % Plot the bad channels
         figureDim = [0 0 1 1];
