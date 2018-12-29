@@ -24,13 +24,13 @@ end
 addpath(genpath(fullfile(pwd,'functions')));
 % Get the data path based on the hostname of the computer in use. The
 % variables are unaffected from the OS.
-[~,data_path, ~]        = getCore;
+%[~,data_path, ~]        = getCore;
 %% -----------  BRANCH 2 - SPECIFY THE RESEARCH CENTER  AND THE CLEANING PARAMETERS ----------- %
 % In this branch we manunally add the list of patients that corresponds to each
 % individual project.
 P = parsePairs(varargin);
 % load settings and parameters
-[settings, params, P]   = load_settings_params(data_path, P);
+[settings, params, P]   = load_settings_params(P);
 %% -----------  BRANCH 3 - LOAD THE RAW DATA ----------- %
 % load the raw data : matrix of dimensions : [channels x time]. 
 [raw_data, ~, labels]   = load_raw_data(settings, P);

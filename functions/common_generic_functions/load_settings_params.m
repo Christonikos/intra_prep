@@ -1,4 +1,4 @@
-function [settings, params, P] = load_settings_params(hard_drive_path, P)
+function [settings, params, P] = load_settings_params(P)
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
 %       INPUTS  :
@@ -44,16 +44,17 @@ function [settings, params, P] = load_settings_params(hard_drive_path, P)
 % --------------------------------------------------------------------------------------------------------
 
 %------------------- HOSPITAL - CHOSEN IN THE RUN FUNCTION -------------------%
+hard_drive_path = P.root_path;
 checkField(P,'Hospital',{'Houston'});
 % get the hospital-ID
-hopid = P.Hospital{1};
+hopid = P.Hospital;
 
 switch hopid
     case 'Houston'
         % -------- Patients -------- %
         checkField(P,'patients',{'TS096'});
         % get the patient-ID
-        patid               = P.patients{1};
+        patid               = P.patients;
         settings.patient    = patid;
         % ------------------------------------- SETTINGS ------------------------------------- %
         settings.path2rawdata   = fullfile(hard_drive_path,'NeuroSyntax2','Data','Houston', settings.patient);
@@ -157,5 +158,42 @@ switch hopid
         params.second_harmonic{2}   = params.first_harmonic{1} +2;
         params.third_harmonic{1}    = 149;
         params.third_harmonic{2}    = params.first_harmonic{1} +2;
+
+    case 'UCLA'
         
+        % -------- Patients -------- %
+        checkField(P,'patients','patient_479');
+        % get the patient-ID
+        patid               = P.patients;
+        settings.patient    = patid;
+        % ------------------------------------- SETTINGS ------------------------------------- %
+        settings.path2rawdata   = fullfile(hard_drive_path,'Data','UCLA', settings.patient, 'Raw');
+        %------------------- Figure paths -------------------%
+        settings.path2figures   = fullfile(hard_drive_path,'NeuroSyntax2','Figures', settings.patient, filesep);
+        %------------------- Output paths -------------------%
+        settings.path2output    = fullfile(hard_drive_path,'NeuroSyntax2','Output', settings.patient ,filesep);
+        % ------------------------------------- PARAMETERS  ------------------------------------- %
+        params.srate    = 2000;
+        params.soa      = 0.532;
+        % Set the notch-filtering bandwidth
+        params.first_harmonic{1}        = 59;
+        params.first_harmonic{2}        = params.first_harmonic{1} +2;
+        params.first_sub_harmonic{1}    = 89;
+        params.first_sub_harmonic{2}    = params.first_sub_harmonic{1} +2;
+        params.second_harmonic{1}       = 119;
+        params.second_harmonic{2}       = params.second_harmonic{1} +2;
+        params.third_harmonic{1}        = 179;
+        params.third_harmonic{2}        = params.third_harmonic{1} +2;
+        
+        % -------- Recording methods -------- %
+        checkField(P,'recordingmethod',{'sEEG'});
+        checkField(P,'datatype',{'Blackrock'});
+        % -------- Cleaning Thresholds --------     %
+        checkField(P,'medianthreshold', 5);         % distance from the median
+        checkField(P,'spikingthreshold',80);        % spiking threshold
+        checkField(P,'rereference','bipolar');      % commonaverage, clinical
+        checkField(P,'vizualization',true);         %'slow'/'quick'.
+        checkField(P,'hfo_detection',false);
+        checkField(P,'rawfilename','TS096_NeuroSyntax2_sEEG_files_a/20170606-111436-001.ns3')
 end
+P
