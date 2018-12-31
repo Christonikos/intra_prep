@@ -169,9 +169,9 @@ switch hopid
         % ------------------------------------- SETTINGS ------------------------------------- %
         settings.path2rawdata   = fullfile(hard_drive_path,'Data','UCLA', settings.patient, 'Raw');
         %------------------- Figure paths -------------------%
-        settings.path2figures   = fullfile(hard_drive_path,'NeuroSyntax2','Figures', settings.patient, filesep);
+        settings.path2figures   = fullfile(hard_drive_path,'Figures', settings.patient, filesep);
         %------------------- Output paths -------------------%
-        settings.path2output    = fullfile(hard_drive_path,'NeuroSyntax2','Output', settings.patient ,filesep);
+        settings.path2output    = fullfile(hard_drive_path,'Output', settings.patient ,filesep);
         % ------------------------------------- PARAMETERS  ------------------------------------- %
         params.srate    = 2000;
         params.soa      = 0.532;

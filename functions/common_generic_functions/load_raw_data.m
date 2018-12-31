@@ -19,7 +19,7 @@
 %   OUTPUTS :
 %                   1. raw_data         : Matrix  -   Dimensions [Channels x time]
 %
-%           		2. channels         : Double  -   Number of channels used in the current raw file.
+%                   2. channels         : Double  -   Number of channels used in the current raw file.
 %
 %                   3. labels           : String  -   Channel labels
 %                                                     provided by the recording system. 
@@ -27,7 +27,7 @@
 function [raw_data, channels, labels] = load_raw_data(settings, P)
 recID                   = P.recordingmethod{1};
 hopID                   = P.Hospital;
-datatypeID              = P.datatype{1};
+datatypeID              = P.datatype;
 disp([newline '---------- Loading the raw data -------------' ...
             newline newline ...
             'Patient            : ' settings.patient '.' newline ...
@@ -55,26 +55,20 @@ switch datatypeID
         channels = size(raw_data,1);
         labels   = vertcat(NS3.ElectrodesInfo.Label);
     case 'Neuralynx'
-        % Extract time0 and timeend from NEV file
-%         nev_filename = fullfile(base_folder, 'nev_files', 'Events.nev');
-% %             [TimeStamps, EventIDs, Nttls, Extras, EventStrings] = Nlx2MatEV_v3(nev_filename, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
-
-        % Extract raw data and save into MAT files
-%         ncs_files = dir([base_folder '/Raw/*.ncs']);
-%         idx=1;
-%         for ncs_file_name=ncs_files'
-%             file_name = ncs_file_name.name;
-%             fprintf('%s\n', file_name)
-%             ncs_file = fullfile(base_folder,'Raw',file_name);
-%                 ncs_file = fullfile(base_folder,file_name);
-%             fprintf('CSC of channnel %d...',idx);
-        [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples, Samples, Header] = Nlx2MatCSC_v3(ncs_file,[1 1 1 1 1],1,1,1);
-        data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
-        data=int16(data);
-        samplingInterval = 1000/SampleFrequencies(1);
-%             save(fullfile(output_path,['CSC' num2str(idx) '.mat']),'data','samplingInterval', 'file_name');
-%             fprintf('saved as %s \n', fullfile(output_path,['CSC' num2str(idx) '.mat']));
-%             electrodes_info{idx} = ncs_file_name.name;
-%             idx = idx+1;
-%         end
+%       [TimeStamps, EventIDs, Nttls, Extras, EventStrings] = Nlx2MatEV_v3(nev_filename, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
+        raw_data = []; labels = [];
+        ncs_files = dir(fullfile(settings.path2rawdata, '*.ns5'));
+        channels=0;
+        for ncs_file_name=ncs_files'
+            file_name = ncs_file_name.name;
+            fprintf('%i Reading file %s\n', channels, file_name)
+            ncs_file = fullfile(settings.path2rawdata,file_name);
+            [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples, Samples, Header] = Nlx2MatCSC_v3(ncs_file,[1 1 1 1 1],1,1,1);
+            data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
+            data=int16(data);
+            raw_data = [raw_data; data];
+%             samplingInterval = 1000/SampleFrequencies(1);
+            labels = [labels, ' ', ncs_file_name.name];
+            channels = channels+1;
+        end
 end
