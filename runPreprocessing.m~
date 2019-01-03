@@ -22,9 +22,11 @@ if feature('IsDebugMode')
 end
 % Add the dependencies to the path.
 addpath(genpath(fullfile(pwd,'functions')));
+
+P = parsePairs();
 %% -----------  LOAD PARAMETERS ----------- %
 % load settings and parameters
-[settings, params, preferences, P] = load_settings_params(varargin);
+[settings, params, P]   = load_settings_params(P);
 %% -----------  LOAD RAW DATA ----------- %
 % load the raw data : matrix of dimensions : [channels x time]. 
 [raw_data, channels, labels]   = load_raw_data(settings, P);

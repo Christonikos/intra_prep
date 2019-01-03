@@ -8,52 +8,65 @@
 %                                                   various locations such as the data directory etc.
 %
 %                   2. P                : Struct  -   The configuration struct that is constructed at the
-%                                                   begginin of each run function.
+%                                                      begginin of each run function.
 %
-%                   3. datatype         : String  -   The data type (provided @ load_settings_params)
 %
-%                   4. elecs_path       : String  -   The path to the electrodes (provided by getCore.m)
-%
-%                   5. hopID            : String  -   This is the hospital ID, specified at the beginning of each run function.
 %
 %   OUTPUTS :
 %                   1. raw_data         : Matrix  -   Dimensions [Channels x time]
 %
 %                   2. channels         : Double  -   Number of channels used in the current raw file.
 %
-%                   3. labels           : String  -   Channel labels
-%                                                     provided by the recording system. 
+
 % ---------------------------------------------------------------------------------------------------------------
 function [raw_data, channels, labels] = load_raw_data(settings, P)
-recID                   = P.recordingmethod{1};
-hopID                   = P.Hospital;
-datatypeID              = P.datatype;
-disp([newline '---------- Loading the raw data -------------' ...
-            newline newline ...
-            'Patient            : ' settings.patient '.' newline ...
-            'Hospital           : ' hopID newline ...
-            'Recording method   : ' num2str(recID) newline ...
-            'Datatype           : ' datatypeID newline ...
-            newline   '-----------------------------------------'])
 
-switch datatypeID
+disp([newline '---------- Loading the raw data -------------' ...
+    newline newline ...
+    'Patient            : ' P.patient '.' newline ...
+    'Hospital           : ' P.hospital newline ...
+    'Datatype           : ' P.datatype newline ...
+    newline   '-----------------------------------------'])
+
+switch P.datatype
     case 'Blackrock'
         %% --------- LOAD THE RAW BLACKROCK DATA --------- %%
-        % Provide information to the user        
-        openNSx(fullfile(join([settings.path2rawdata,filesep,P.rawfilename])))
-        % list the output that Blackrock provides
-        files       = NS3.Data;
-        files_len   = length(files);
-        switch files_len
-            case 2
-                if length(files{1}) > length(files{2})
-                    raw_data =   files{1};
-                else
-                    raw_data =   files{2};
-                end
+        % List the available files per session 
+        nfiles = dir(fullfile(settings.path2rawdata, '*.ns3'));
+        % loop through the available files
+        for file_id = 1:numel(nfiles)
+            openNSx(fullfile(join([settings.path2rawdata,filesep,nfiles(file_id).name])))
+            % list the output that Blackrock provides
+            files       = NS3.Data;
+            files_len   = length(files);
+            switch files_len
+                case 2
+                    if length(files{1}) > length(files{2})
+                        data =   files{1};
+                    else
+                        data =   files{2};
+                    end
+            end
+            ns3_files{file_id} = data;
+            % release memory
+            clear data files files_len
         end
-        channels = size(raw_data,1);
-        labels   = vertcat(NS3.ElectrodesInfo.Label);
+       % zero pad the time-difference between the two .ns3 files
+        timeDelay = length(ns3_files{1}) - length(ns3_files{2});
+        if sign(timeDelay) == -1
+            ns3_files{1} = [ns3_files{1}, zeros(size(ns3_files{1},1),abs(timeDelay))];
+        else
+            ns3_files{2} = [ns3_files{2}, zeros(size(ns3_files{2},1),abs(timeDelay))];
+        end
+        % concatenate the two files into a single variable: 
+        raw_data = [ns3_files{1}; ns3_files{2}];
+        %% Output check
+        if ~(size(raw_data,2) > size(raw_data,1))
+            error('Wrong dimensions!')
+        end
+       
+        
+
     case 'Neuralynx'
         raw_data = []; labels = [];
         ncs_files = dir(fullfile(settings.path2rawdata, '*.ncs'));
@@ -66,7 +79,7 @@ switch datatypeID
             data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
             data=int16(data);
             raw_data = [raw_data; data];
-%             samplingInterval = 1000/SampleFrequencies(1);
+            %             samplingInterval = 1000/SampleFrequencies(1);
             labels = [labels, ' ', ncs_file_name.name];
             channels = channels+1;
         end

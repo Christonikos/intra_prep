@@ -93,7 +93,7 @@ end
 %% VIZUALIZE REJECTED CHANNELS %% 
 switch P.vizualization
     case true
-        plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data);
+        plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, channel_index, labels);
 end
 %%  ---------------------------- STEP 6 - LINEAR DE-TRENDING        ----------------------------- %%
 filtered_data = filtered_data(filtered_data);
