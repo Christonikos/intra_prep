@@ -45,8 +45,9 @@ switch P.vizualization
 end
 
 % Only keep voltage jumps that exceed the average fluctuation
-average_fluctuation = floor(rec_duration/params.srate);
-exceeding_channels  = find(nr_jumps > average_fluctuation);
+rec_duration_sec = floor(rec_duration/params.srate);
+jump_rate = nr_jumps/rec_duration_sec;
+exceeding_channels  = find(jump_rate > params.jump_rate_thresh);
 
 switch P.vizualization
     case true
@@ -71,8 +72,7 @@ end
 
 disp(['In total ' num2str(length(exceeding_channels)) ...
     ' have been removed due to spiking activity.'...
-    newline ' The channels have the following labels : '  ])
-disp(labels(exceeding_channels,:))
+
 
 clear textprogressbar
 

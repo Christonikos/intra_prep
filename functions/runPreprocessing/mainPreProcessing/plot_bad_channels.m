@@ -1,4 +1,4 @@
-function plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data)
+function plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, channel_index, labels)
 
 % --------  Visual Inspection of the Rejected Channels  -------- %
 % blue channels - detected on step 1 (saturated noise, etc)

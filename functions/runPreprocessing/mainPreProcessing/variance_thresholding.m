@@ -44,8 +44,7 @@ end
 % Set the cutting threshold
 medianthreshold             = P.medianthreshold;
 % Detect those channels that exceed 5 times the median of the
-% detected variance (in both directions) - the median is not affected by the outliers
-% and thus is a better measure compared to the mean here.
+% detected variance (in both directions) 
 spottedChannels_positive    = find(dataVariance > (medianthreshold * median(dataVariance)));
 spottedChannels_negative    = find(dataVariance < (median(dataVariance)/medianthreshold));
 % Provide the first feedback on the channels that have been removed
@@ -53,8 +52,7 @@ labels                      = string(labels);
 
 % Concatenate the detected channels
 spottedChannels             = sort([spottedChannels_negative spottedChannels_positive]);
-clc;
-disp([ 'In total ' num2str(length(spottedChannels)) ...
+disp([ 'In total ' num2str(length(spottedChannels)) ' channels' ...
     ' have been removed based on the variance of the all channels.'...
     newline ' The channels have the following labels : '  newline])
 disp([ labels(spottedChannels)])

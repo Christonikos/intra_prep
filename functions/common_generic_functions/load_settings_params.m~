@@ -1,9 +1,14 @@
 function [settings, params, preferences, P] = load_settings_params(arguments)
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
-%       INPUTS  :   varargin
-%
-%       OUTPUTS : 
+%       INPUTS  :
+%                   1. hard_drive_path : String - The path to the data (provided by getCore.m)
+%                   2. patid           : String - The ID of the given
+%                                        patient (provided @ runPreprocessing.m)
+%                   3. hopid           : String - The hospital-ID (provided @ runPreprocessing.m).
+%                   4. P               : Struct - The main configuration
+%                                                 struct (created @ runPreprocessing.m)
+%       OUTPUTS : varargin
 %                   1. settings        : Struct - Holds the paths to
 %                                                 various locations such as the data directory etc.
 %                   2. params          : Struct - Holds various hospital-specific information such as the
@@ -27,24 +32,22 @@ function [settings, params, preferences, P] = load_settings_params(arguments)
 %                                                 rejected electrodes at each stage
 %                                                 of the pipeline.
 %
-%                   4.P                : Struct - Holds generic arguments
-%                                                 such as the root path, 
-%                                                 the datatype and the session.
+%                   4.P                : Struct - Hold
 % ---------------------------------------------------------------------------------------------
 P = parsePairs(arguments);
 %% -------- Default arguments -------- %%
 checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
-checkField(P,'hospital' ,'Houston');
+checkField(P,'Hospital' ,'Houston');
 checkField(P,'patient'  ,'TS096');
 checkField(P,'datatype' ,'Blackrock');
 checkField(P,'session'  ,'s1')
 %% General settings:
 %------------------- Raw data path -------------------%
-settings.path2rawdata   = fullfile(P.root_path,'data',   P.hospital , P.patient, P.session, filesep);
+settings.path2rawdata   = fullfile(P.root_path,'data', P.patient,P.session, filesep);
 %------------------- Figures path -------------------%
-settings.path2figures   = fullfile(P.root_path,'figures',P.hospital , P.patient, P.session, filesep);
+settings.path2figures   = fullfile(P.root_path,'figures', P.patient, filesep);
 %------------------- Output path -------------------%
-settings.path2output    = fullfile(P.root_path,'output', P.hospital , P.patient, P.session, filesep);
+settings.path2output    = fullfile(P.root_path,'output',  P.patient, filesep);
 
 %% General parameters:
 params.jump_rate_thresh = 1;    % [Hz] For spike detection (stage 3): meximal number of jumps allowed per sec.
