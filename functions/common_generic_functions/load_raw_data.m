@@ -55,9 +55,8 @@ switch datatypeID
         channels = size(raw_data,1);
         labels   = vertcat(NS3.ElectrodesInfo.Label);
     case 'Neuralynx'
-%       [TimeStamps, EventIDs, Nttls, Extras, EventStrings] = Nlx2MatEV_v3(nev_filename, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
         raw_data = []; labels = [];
-        ncs_files = dir(fullfile(settings.path2rawdata, '*.ns5'));
+        ncs_files = dir(fullfile(settings.path2rawdata, '*.ncs'));
         channels=0;
         for ncs_file_name=ncs_files'
             file_name = ncs_file_name.name;
