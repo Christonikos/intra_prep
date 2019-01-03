@@ -60,8 +60,8 @@ switch datatypeID
         channels=0;
         for ncs_file_name=ncs_files'
             file_name = ncs_file_name.name;
-            fprintf('%i Reading file %s\n', channels, file_name)
             ncs_file = fullfile(settings.path2rawdata,file_name);
+            fprintf('Channel #%i Reading file %s\n', channels+1, ncs_file)
             [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples, Samples, Header] = Nlx2MatCSC_v3(ncs_file,[1 1 1 1 1],1,1,1);
             data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
             data=int16(data);

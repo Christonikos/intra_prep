@@ -44,6 +44,9 @@ function [settings, params, P] = load_settings_params(P)
 % --------------------------------------------------------------------------------------------------------
 
 %------------------- HOSPITAL - CHOSEN IN THE RUN FUNCTION -------------------%
+P.root_path = '/home/yl254115/Projects/single_unit_syntax/';
+P.Hospital = 'UCLA';
+P.datatype = 'Neuralynx';
 hard_drive_path = P.root_path;
 checkField(P,'Hospital',{'Houston'});
 % get the hospital-ID
