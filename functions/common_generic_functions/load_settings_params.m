@@ -1,4 +1,8 @@
-function [settings, params, preferences, P] = load_settings_params(arguments)
+function [settings, params, preferences, P] = load_settings_params(P)
+% -------------------------------------
+% function args = load_settings_params(P)
+% --------------------------------------
+
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
 %       INPUTS  :   varargin
@@ -31,20 +35,24 @@ function [settings, params, preferences, P] = load_settings_params(arguments)
 %                                                 such as the root path, 
 %                                                 the datatype and the session.
 % ---------------------------------------------------------------------------------------------
-P = parsePairs(arguments);
+P = parsePairs(P);
 %% -------- Default arguments -------- %%
 checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
 checkField(P,'hospital' ,'Houston');
 checkField(P,'patient'  ,'TS096');
 checkField(P,'datatype' ,'Blackrock');
 checkField(P,'session'  ,'s1')
+
 %% General settings:
-%------------------- Raw data path -------------------%
-settings.path2rawdata   = fullfile(P.root_path,'data',   P.hospital , P.patient, P.session, filesep);
-%------------------- Figures path -------------------%
-settings.path2figures   = fullfile(P.root_path,'figures',P.hospital , P.patient, P.session, filesep);
-%------------------- Output path -------------------%
-settings.path2output    = fullfile(P.root_path,'output', P.hospital , P.patient, P.session, filesep);
+settings.path2rawdata   = fullfile(P.root_path,'data',   P.hospital , P.patient, P.session, filesep); % Path to raw-data folder
+settings.path2figures   = fullfile(P.root_path,'figures',P.hospital , P.patient, P.session, filesep); % Path to Figures folder
+settings.path2output    = fullfile(P.root_path,'output', P.hospital , P.patient, P.session, filesep); % Path to output folder
+
+% Append info to settings object:
+settings.root_path = P.root_path;
+settings.hospital = P.hospital;
+settings.patient = P.patient;
+settings.datatype = P.datatype;
 
 %% General parameters:
 params.downsampling                 = 500;    % [Hz]
@@ -67,4 +75,6 @@ preferences.visualization           = false;
 preferences.filter_sub_harmonics    = false;
 preferences.hfo_detection           = false;
 
-
+args.settings = settings;
+args.params = params;
+args.prefernces = preferences;
