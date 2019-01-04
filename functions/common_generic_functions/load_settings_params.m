@@ -55,15 +55,17 @@ settings.patient = P.patient;
 settings.datatype = P.datatype;
 
 %% General parameters:
-params.downsampling                 = 500;    % [Hz]
+params.downsampling_ratio           = 4; % integer: Decrease the sampling rate of a sequence by n.
 params.srate            = 2000;
 % Stage 1: line filtering (set the notch-filtering bandwidth)
 params.first_harmonic{1}            = 59;
 params.first_harmonic{2}            = params.first_harmonic{1}  + 2;
+params.first_sub_harmonic{1}        = 90; % Apply only if preference.filter_sub_harmonics is set to True
 params.second_harmonic{1}           = 119;
 params.second_harmonic{2}           = params.second_harmonic{1} + 2;
 params.third_harmonic{1}            = 179;
 params.third_harmonic{2}            = params.third_harmonic{1}  + 2;
+
 % Stage 2: variance-based rejection
 params.medianthreshold              = 5;      % [var] used @stage 1
 params.spikingthreshold             = 80;     % [mV]  used @stage 2
@@ -72,6 +74,7 @@ params.jump_rate_thresh = 1;    % [Hz] For spike detection (stage 3): meximal nu
 
 %% Preferences
 preferences.visualization           = false;
+preferences.down_sample_data        = true;
 preferences.filter_sub_harmonics    = false;
 preferences.hfo_detection           = false;
 
