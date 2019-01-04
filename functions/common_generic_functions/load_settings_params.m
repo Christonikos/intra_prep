@@ -2,7 +2,7 @@ function args = load_settings_params(P)
 
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
-%       INPUTS  :   varargin
+%       INPUTS  :   P                  :varargin
 %
 %       OUTPUTS :   args               : Struct - with the following fields
 %                   1. settings        : Struct - paths and general info
@@ -10,8 +10,9 @@ function args = load_settings_params(P)
 %                   3. preferences     : Struct - flags for what to execute 
 %
 % ---------------------------------------------------------------------------------------------
-P = parsePairs(P);
+
 %% -------- Default arguments -------- %%
+P = parsePairs(P); % Parse varargin
 checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
 checkField(P,'hospital' ,'Houston');
 checkField(P,'patient'  ,'TS096');
