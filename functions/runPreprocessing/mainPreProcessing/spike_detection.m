@@ -1,4 +1,4 @@
-function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, labels, allchannels, P, params, settings)
+function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, labels, allchannels, args)
 
 % Provide feedback to the user.
 disp([newline...
@@ -9,7 +9,7 @@ disp([newline...
 
 
 % Set a threshold (in mV)
-jump_threshold = P.spikingthreshold;
+jump_threshold = args.params.spikingthreshold;
 % Initialize variable to hold the channels that will be rejected
 % due to spiking activity
 channels        = size(filtered_data,1);
@@ -26,7 +26,7 @@ for chID = 1:size(filtered_data,1)
 end
 textprogressbar([newline 'Detection completed.'])
 
-switch P.vizualization
+switch args.preferences.vizualization
     case true
         % Plot the spike-plot
         figureDim = [0 0 1 1];
@@ -39,35 +39,34 @@ switch P.vizualization
         grid minor
         pause(5)
         
-        file_name = ['SpikingChannels_', settings.patient , '.png'];
-        saveas(f, fullfile(settings.path2figures, file_name), 'png')
+        file_name = ['SpikingChannels_', args.settings.patient , '.png'];
+        saveas(f, fullfile(args.settings.path2figures, file_name), 'png')
         close(f)
 end
 
 % Only keep voltage jumps that exceed the average fluctuation
-rec_duration_sec = floor(rec_duration/params.srate);
+rec_duration_sec = floor(rec_duration/args.params.srate);
 jump_rate = nr_jumps/rec_duration_sec;
-exceeding_channels  = find(jump_rate > params.jump_rate_thresh);
+exceeding_channels  = find(jump_rate > args.params.jump_rate_thresh);
 
-switch P.vizualization
-    case true
-        % Plot the spike-plot
-        figureDim = [0 0 1 1];
-        f = figure('units', 'normalized', 'outerposition', figureDim);
-        for spikeCh = 1:length(exceeding_channels)
-            plot(zscore(filtered_data(exceeding_channels(spikeCh),:)))
-            title(['Label : ' labels(exceeding_channels(spikeCh))...
-                'Channel Index : ' ...
-                num2str(exceeding_channels(spikeCh))],'Interpreter','none')
-            xlabel('time [samples]')
-            ylabel('z-score')
-            legend(['Channel ' num2str(spikeCh) '/' num2str(length(exceeding_channels)) newline '' ] ...
-                ,'Location','northeastoutside')
-            grid on
-            grid minor
-            pause(5)
-        end
-        close(f)
+if args.preferences.vizualization
+    % Plot the spike-plot
+    figureDim = [0 0 1 1];
+    f = figure('units', 'normalized', 'outerposition', figureDim);
+    for spikeCh = 1:length(exceeding_channels)
+        plot(zscore(filtered_data(exceeding_channels(spikeCh),:)))
+        title(['Label : ' labels(exceeding_channels(spikeCh))...
+            'Channel Index : ' ...
+            num2str(exceeding_channels(spikeCh))],'Interpreter','none')
+        xlabel('time [samples]')
+        ylabel('z-score')
+        legend(['Channel ' num2str(spikeCh) '/' num2str(length(exceeding_channels)) newline '' ] ...
+            ,'Location','northeastoutside')
+        grid on
+        grid minor
+        pause(5)
+    end
+    close(f)
 end
 
 disp(['In total ' num2str(length(exceeding_channels)) ...

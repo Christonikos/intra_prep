@@ -1,4 +1,4 @@
-function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, allchannels, P)
+function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, allchannels, args)
 
 % Get the variance of all channels
 disp([newline 'Detecting the variance of all channels'])
@@ -8,7 +8,7 @@ for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
 disp(['The calculation has been completed'])
-switch P.vizualization
+switch args.preferences.vizualization
     case true
         figureDim = [0 0 1 1];
         figure('units', 'normalized', 'outerposition', figureDim)
@@ -42,7 +42,7 @@ switch P.vizualization
         close all
 end
 % Set the cutting threshold
-medianthreshold             = P.medianthreshold;
+medianthreshold             = args.params.medianthreshold;
 % Detect those channels that exceed 5 times the median of the
 % detected variance (in both directions) 
 spottedChannels_positive    = find(dataVariance > (medianthreshold * median(dataVariance)));
@@ -60,37 +60,36 @@ disp([ labels(spottedChannels)])
 % Update the logical channel variable
 allchannels(spottedChannels') = false;
 
-switch P.vizualization
-    case true
-        % Plot the bad channels
-        figureDim = [0 0 1 1];
-        figure('units', 'normalized', 'outerposition', figureDim)
-        for bch = 1:length(spottedChannels)
-            if bch == 1
-                t = text(0.5,0.5,'These are the channels rejected from step 1');
-                t.BackgroundColor = 'k';
-                t.Color = 'w';
-                t.FontSize = 25;
-                t.FontWeight = 'Bold';
-                t.FontSmoothing = 'on';
-                t.Clipping = 'on';
-                t.HorizontalAlignment = 'center';
-                axis off;
-                pause(3)
-            end
-            plot(zscore(filtered_data(spottedChannels(bch),:)))
-            title(['Label : ' labels(spottedChannels(bch))...
-                'Channel Index : ' ...
-                num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
-            xlabel('Time [samples]')
-            ylabel('zscore')
-            grid on
-            grid minor
-            legend(['Channel ' num2str(bch) '/' num2str(length(spottedChannels)) newline '' ] ...
-                ,'Location','northeastoutside')
-            pause(5)
+if args.preferences.vizualization
+    % Plot the bad channels
+    figureDim = [0 0 1 1];
+    figure('units', 'normalized', 'outerposition', figureDim)
+    for bch = 1:length(spottedChannels)
+        if bch == 1
+            t = text(0.5,0.5,'These are the channels rejected from step 1');
+            t.BackgroundColor = 'k';
+            t.Color = 'w';
+            t.FontSize = 25;
+            t.FontWeight = 'Bold';
+            t.FontSmoothing = 'on';
+            t.Clipping = 'on';
+            t.HorizontalAlignment = 'center';
+            axis off;
+            pause(3)
         end
-        close all
+        plot(zscore(filtered_data(spottedChannels(bch),:)))
+        title(['Label : ' labels(spottedChannels(bch))...
+            'Channel Index : ' ...
+            num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
+        xlabel('Time [samples]')
+        ylabel('zscore')
+        grid on
+        grid minor
+        legend(['Channel ' num2str(bch) '/' num2str(length(spottedChannels)) newline '' ] ...
+            ,'Location','northeastoutside')
+        pause(5)
+    end
+    close all
 end
 
 

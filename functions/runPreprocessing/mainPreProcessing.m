@@ -1,4 +1,4 @@
-function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(P, raw_data, params, labels, settings)
+function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args)
 % This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
@@ -7,14 +7,11 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                   variable has been created using the function load_raw_data. It is
 %                                                   advised that you provide the data chunked, to avoid nemory problems
 %
-%                       2. params       : Struct -  Holds various hospital-specific information such as the 
-%                                                   soa of the paradigm and the notch filtering parameters.
+%                       2. labels       : String -  Channel labels provided by the recording system. 
 %
-%                       3. labels       : String -  Channel labels provided by the recording system. 
-%
-%                       4. P            : Struct -  The main configuration
+%                       3. args         : Struct -  The main configuration
 %                                                   struct constructed
-%                                                   @load_settings_params.m
+%                                                   @load_settings_args.params.m
 %
 %   OUTPUTS : 
 %                       1. filtered_data     : Matrix - Data in format [channels x time]. Rejection of channels based on : 
@@ -58,7 +55,7 @@ end
 % Initialize a logical array where we assume all channels to be 1.
 channel_index                   =   true(size(raw_data,1),1);
 %% ---------------------------------  STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
-[filtered_data, params]         =   filter_linenoise(raw_data, params);
+filtered_data         =   filter_linenoise(raw_data, args);
 % After this step, the data are :
 % 1. Notch filtered for line noise and harmonics.
 % 2. Downsampled to 1kHz.
@@ -66,13 +63,13 @@ channel_index                   =   true(size(raw_data,1),1);
 %    Removal of channels based on the variance of the raw power.
 %    This step will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-[filtered_data, channel_index, rejected_on_step_2]  =   variance_thresholding(filtered_data, labels, channel_index, P);
+[filtered_data, channel_index, rejected_on_step_2]  =   variance_thresholding(filtered_data, labels, channel_index, args);
 %%  --------------------------------- STEP 3 - SPIKES DETECTION          ---------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, labels, channel_index, P, params, settings);
+[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, labels, channel_index, args);
 %%  ---------------------------- STEP 4 - REJECTION BASED ON FREQUENCY CONTENT ----------------------------- %%
-[filtered_data, channel_index, rejected_on_step_4]  =   rejection_based_on_powerspectrum(filtered_data, labels, channel_index, params);
+[filtered_data, channel_index, rejected_on_step_4]  =   rejection_based_on_powerspectrum(filtered_data, labels, channel_index, args);
 
 % Provide a summary from step 1 to 4 to the user :
 disp([newline newline                                                                       ...
@@ -85,15 +82,13 @@ disp([newline newline                                                           
     newline newline])
 pause(3);
 
-switch P.hfo_detection
-    case true
-        %%  ---------------------------- STEP 5 - REJECTION BASED ON HFOs ----------------------------- %%
-        [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels , channel_index, params);
+if args.preferences.hfo_detection
+    %%  ---------------------------- STEP 5 - REJECTION BASED ON HFOs ----------------------------- %%
+    [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels , channel_index, args);
 end
 %% VIZUALIZE REJECTED CHANNELS %% 
-switch P.vizualization
-    case true
-        plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, channel_index, labels);
+if args.preferences.vizualization
+    plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, channel_index, labels);
 end
 %%  ---------------------------- STEP 6 - LINEAR DE-TRENDING        ----------------------------- %%
 filtered_data = filtered_data(filtered_data);
