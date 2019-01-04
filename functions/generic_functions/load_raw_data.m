@@ -19,23 +19,24 @@
 %
 
 % ---------------------------------------------------------------------------------------------------------------
-function [raw_data, channels, labels] = load_raw_data(settings, P)
+function [raw_data, channels] = load_raw_data(args)
 
 disp([newline '---------- Loading the raw data -------------' ...
     newline newline ...
-    'Patient            : ' P.patient '.' newline ...
-    'Hospital           : ' P.hospital newline ...
-    'Datatype           : ' P.datatype newline ...
+    'Patient            : ' args.settings.patient  '.' newline ...
+    'Hospital           : ' args.settings.hospital '.' newline ...
+    'Datatype           : ' args.settings.datatype '.' newline ...
     newline   '-----------------------------------------'])
 
-switch P.datatype
+% switch datatype
+switch args.settings.datatype
     case 'Blackrock'
         %% --------- LOAD THE RAW BLACKROCK DATA --------- %%
         % List the available files per session 
-        nfiles = dir(fullfile(settings.path2rawdata, '*.ns3'));
+        nfiles = dir(fullfile(args.settings.path2rawdata, '*.ns3'));
         % loop through the available files
         for file_id = 1:numel(nfiles)
-            openNSx(fullfile(join([settings.path2rawdata,filesep,nfiles(file_id).name])))
+            openNSx(fullfile(join([args.settings.path2rawdata,filesep,nfiles(file_id).name])))
             % list the output that Blackrock provides
             files       = NS3.Data;
             files_len   = length(files);
@@ -64,23 +65,23 @@ switch P.datatype
         if ~(size(raw_data,2) > size(raw_data,1))
             error('Wrong dimensions!')
         end
+        channels = size(raw_data,1);
        
         
 
     case 'Neuralynx'
         raw_data = []; labels = [];
-        ncs_files = dir(fullfile(settings.path2rawdata, '*.ncs'));
+        ncs_files = dir(fullfile(args.settings.path2rawdata, '*.ncs'));
         channels=0;
         for ncs_file_name=ncs_files'
             file_name = ncs_file_name.name;
-            ncs_file = fullfile(settings.path2rawdata,file_name);
+            ncs_file = fullfile(args.settings.path2rawdata,file_name);
             fprintf('Channel #%i Reading file %s\n', channels+1, ncs_file)
             [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples, Samples, Header] = Nlx2MatCSC_v3(ncs_file,[1 1 1 1 1],1,1,1);
             data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
             data=int16(data);
             raw_data = [raw_data; data];
             %             samplingInterval = 1000/SampleFrequencies(1);
-            labels = [labels, ' ', ncs_file_name.name];
             channels = channels+1;
         end
 end

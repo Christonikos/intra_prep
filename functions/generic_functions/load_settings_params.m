@@ -25,10 +25,10 @@ settings.path2figures   = fullfile(P.root_path,'figures',P.hospital , P.patient,
 settings.path2output    = fullfile(P.root_path,'output', P.hospital , P.patient, P.session, filesep); % Path to output folder
 
 % Append info to settings object:
-settings.root_path = P.root_path;
-settings.hospital = P.hospital;
-settings.patient = P.patient;
-settings.datatype = P.datatype;
+settings.root_path  =    P.root_path;
+settings.hospital   =    P.hospital;
+settings.patient    =    P.patient;
+settings.datatype   =    P.datatype;
 
 %% General parameters:
 params.downsampling_ratio           = 4; % integer: Decrease the sampling rate of a sequence by n.
@@ -37,6 +37,7 @@ params.srate            = 2000;
 params.first_harmonic{1}            = 59;
 params.first_harmonic{2}            = params.first_harmonic{1}  + 2;
 params.first_sub_harmonic{1}        = 90; % Apply only if preference.filter_sub_harmonics is set to True
+params.first_sub_harmonic{2}        = params.first_sub_harmonic{1} + 2;
 params.second_harmonic{1}           = 119;
 params.second_harmonic{2}           = params.second_harmonic{1} + 2;
 params.third_harmonic{1}            = 179;
@@ -46,7 +47,7 @@ params.third_harmonic{2}            = params.third_harmonic{1}  + 2;
 params.medianthreshold              = 5;      % [var] used @stage 1
 params.spikingthreshold             = 80;     % [mV]  used @stage 2
 % Stage 3: spike detection
-params.jump_rate_thresh = 1;    % [Hz] For spike detection (stage 3): meximal number of jumps allowed per sec.
+params.jump_rate_thresh             = 1;      % [Hz] For spike detection (stage 3): meximal number of jumps allowed per sec.
 
 %% Preferences
 preferences.visualization           = false;
@@ -55,8 +56,8 @@ preferences.filter_sub_harmonics    = false;
 preferences.hfo_detection           = false;
 
 %% Append to args struct:
-args.settings = settings;
-args.params = params;
-args.prefernces = preferences;
+args.settings       = settings;
+args.params         = params;
+args.preferences    = preferences;
 
 end

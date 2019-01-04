@@ -27,11 +27,10 @@ addpath(genpath(fullfile(pwd,'functions')));
 args = load_settings_params(varargin);
 %% -----------  LOAD RAW DATA ----------- %
 % load the raw data : matrix of dimensions : [channels x time]. 
-[raw_data, channels, labels]   = load_raw_data(args);
+[raw_data, channels]   = load_raw_data(args);
 fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
-fprintf('With labels: %s\n', labels)
 %% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
-[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args);
+[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, args);
 
 %% TODO: Save the filtered data into a new folder
 
