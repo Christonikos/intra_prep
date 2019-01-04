@@ -40,6 +40,8 @@ Importantly, *the pipeline expect a very specific folder tree*, as examplified b
 Then, the '/Data' subfolder has hospital names as subfolder, then patients and finally sessions.
 Below is an example for the required folder tree for a project called 'Neurosyntax', with data from two hospital: Houston, with two patients - TS096 (with three sessions S01, S02, S03) and TS104 (with two session S01, S02); and UCLA, with two patients - P479 (with two sessions S01 and S01) and P482 (with a single session S01):
 
+```bash
+
 └── Neurosyntax\n
     ├── Data\n
     │   ├── Houston\n
@@ -66,7 +68,7 @@ Below is an example for the required folder tree for a project called 'Neurosynt
     │           └── S01
     ├── Figures
     └── Output
-
+```
 - The raw blackrock (*.nsX) or Neuralynx (*.ncs) files should be in the session subfolders, as examplified for Houston/TS096/S01 sub-folder in the above tree.
 - Any deviation from this data organization structure would result in errors!
 
