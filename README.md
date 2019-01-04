@@ -41,10 +41,15 @@ Then, the '/Data' subfolder has hospital names as subfolder, then patients and f
 Below is an example for the required folder tree for a project called 'Neurosyntax', with data from two hospital: Houston, with two patients - TS096 (with three sessions S01, S02, S03) and TS104 (with two session S01, S02); and UCLA, with two patients - P479 (with two sessions S01 and S01) and P482 (with a single session S01):
 
 └── Neurosyntax
+
     ├── Data
+
     │   ├── Houston
+
     │   │   ├── TS096
+
     │   │   │   ├── S01
+
     │   │   │   │   ├── GA1-STG1.ncs
     │   │   │   │   ├── GA1-STG2.ncs
     │   │   │   │   ├── GA1-STG3.ncs
