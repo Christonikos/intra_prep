@@ -52,9 +52,9 @@ end
 %       1 == non rejected channel.
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
-channel_index         =   true(size(raw_data,1),1);
+channel_index            =   true(size(raw_data,1),1);
 %% ---------------------------------  STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
-filtered_data         =   filter_linenoise(raw_data, args);
+[filtered_data, args]    =   filter_linenoise(raw_data, args);
 % After this step, the data are :
 % 1. Notch filtered for line noise and harmonics.
 % 2. Downsampled to the specified ratio.
@@ -62,11 +62,11 @@ filtered_data         =   filter_linenoise(raw_data, args);
 %    Removal of channels based on the variance of the raw power.
 %    This step will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-[filtered_data, channel_index, rejected_on_step_2]  =   variance_thresholding(filtered_data, labels, channel_index, args);
+[filtered_data, channel_index, rejected_on_step_2]  =   variance_thresholding(filtered_data, channel_index, args);
 %%  --------------------------------- STEP 3 - SPIKES DETECTION          ---------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, labels, channel_index, args);
+[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, channel_index, args);
 %%  ---------------------------- STEP 4 - REJECTION BASED ON FREQUENCY CONTENT ----------------------------- %%
 [filtered_data, channel_index, rejected_on_step_4]  =   rejection_based_on_powerspectrum(filtered_data, labels, channel_index, args);
 

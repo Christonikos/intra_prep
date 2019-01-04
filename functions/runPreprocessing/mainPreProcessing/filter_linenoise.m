@@ -1,4 +1,4 @@
-function filtered_data =  filter_linenoise(raw_data, args)
+function [filtered_data, args] =  filter_linenoise(raw_data, args)
 % filter_linenoise : filters for line-noise and first two harmonics.
 %                    (optional) - downsamples to user specified ratio.
 % INPUTS    : 
@@ -11,6 +11,8 @@ function filtered_data =  filter_linenoise(raw_data, args)
 %                                                           @load_settings_args.params.m
 % OUTPUTS   :           
 %                       1. filtered_data        : Matrix -  Data in format [channels x time]. 
+%                       2. args                 : Struct -  In case of downsampling, we have 
+%                                                           an updated sampling rate.
 % -----------------------------------------------------------------------------------------------------------------------------
 
 %% variables intialization

@@ -1,14 +1,15 @@
-function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, allchannels, args)
+function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, allchannels, args)
 
 % Get the variance of all channels
-disp([newline 'Detecting the variance of all channels'])
+disp([newline 'Detecting the variance of all channels : '])
 % Pre-allocate the variance variable
 dataVariance    = zeros(1,size(filtered_data,1));
 for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
-disp(['The calculation has been completed'])
-switch args.preferences.vizualization
+disp(['Done'])
+
+switch args.preferences.visualization
     case true
         figureDim = [0 0 1 1];
         figure('units', 'normalized', 'outerposition', figureDim)
@@ -47,20 +48,14 @@ medianthreshold             = args.params.medianthreshold;
 % detected variance (in both directions) 
 spottedChannels_positive    = find(dataVariance > (medianthreshold * median(dataVariance)));
 spottedChannels_negative    = find(dataVariance < (median(dataVariance)/medianthreshold));
-% Provide the first feedback on the channels that have been removed
-labels                      = string(labels);
-
 % Concatenate the detected channels
 spottedChannels             = sort([spottedChannels_negative spottedChannels_positive]);
 disp([ 'In total ' num2str(length(spottedChannels)) ' channels' ...
-    ' have been removed based on the variance of the all channels.'...
-    newline ' The channels have the following labels : '  newline])
-disp([ labels(spottedChannels)])
-
+    ' have been removed based on the variance of the all channels.']);
 % Update the logical channel variable
 allchannels(spottedChannels') = false;
 
-if args.preferences.vizualization
+if args.preferences.visualization
     % Plot the bad channels
     figureDim = [0 0 1 1];
     figure('units', 'normalized', 'outerposition', figureDim)
@@ -78,9 +73,8 @@ if args.preferences.vizualization
             pause(3)
         end
         plot(zscore(filtered_data(spottedChannels(bch),:)))
-        title(['Label : ' labels(spottedChannels(bch))...
-            'Channel Index : ' ...
-            num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
+        title(['Channel Index : ' ...
+                num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
         xlabel('Time [samples]')
         ylabel('zscore')
         grid on
@@ -91,10 +85,8 @@ if args.preferences.vizualization
     end
     close all
 end
-
-
 % Set the rejected channels to NaNs
-filtered_data(~allchannels,:) =   NaN;
+filtered_data(~allchannels,:)   =   NaN;
 rejected_on_step_2              =   spottedChannels';
 
 

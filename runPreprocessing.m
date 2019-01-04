@@ -20,6 +20,7 @@ clearvars -except varargin
 if feature('IsDebugMode')
     dbquit all
 end
+dbstop if error
 % Add the dependencies to the path.
 addpath(genpath(fullfile(pwd,'functions')));
 %% -----------  LOAD PARAMETERS ----------- %

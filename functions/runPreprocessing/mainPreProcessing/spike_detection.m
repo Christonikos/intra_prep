@@ -1,11 +1,4 @@
-function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, labels, allchannels, args)
-
-% Provide feedback to the user.
-disp([newline...
-    '---------------- Intiating Stage 3 of the analysis ---------------- ' ...
-    newline ...
-    '(Rejection of channels based on detected spikes)'...
-    newline newline ])
+function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, allchannels, args)
 
 
 % Set a threshold (in mV)
@@ -26,7 +19,7 @@ for chID = 1:size(filtered_data,1)
 end
 textprogressbar([newline 'Detection completed.'])
 
-switch args.preferences.vizualization
+switch args.preferences.visualization
     case true
         % Plot the spike-plot
         figureDim = [0 0 1 1];
@@ -43,20 +36,21 @@ switch args.preferences.vizualization
         saveas(f, fullfile(args.settings.path2figures, file_name), 'png')
         close(f)
 end
-
 % Only keep voltage jumps that exceed the average fluctuation
-rec_duration_sec = floor(rec_duration/args.params.srate);
-jump_rate = nr_jumps/rec_duration_sec;
+rec_duration_sec    = floor(rec_duration/args.params.srate);
+jump_rate           = nr_jumps/rec_duration_sec;
 exceeding_channels  = find(jump_rate > args.params.jump_rate_thresh);
 
-if args.preferences.vizualization
+disp(['In total ' num2str(length(exceeding_channels)) ...
+    ' have been removed due to spiking activity.'])
+
+if args.preferences.visualization
     % Plot the spike-plot
     figureDim = [0 0 1 1];
     f = figure('units', 'normalized', 'outerposition', figureDim);
     for spikeCh = 1:length(exceeding_channels)
         plot(zscore(filtered_data(exceeding_channels(spikeCh),:)))
-        title(['Label : ' labels(exceeding_channels(spikeCh))...
-            'Channel Index : ' ...
+        title(['Channel Index : ' ...
             num2str(exceeding_channels(spikeCh))],'Interpreter','none')
         xlabel('time [samples]')
         ylabel('z-score')
@@ -69,14 +63,11 @@ if args.preferences.vizualization
     close(f)
 end
 
-disp(['In total ' num2str(length(exceeding_channels)) ...
-    ' have been removed due to spiking activity.'...
-
-
-clear textprogressbar
-
 % Update the logical channel variable and remove the trigger channel
 allchannels(exceeding_channels)     = false;
 % Set the rejected channels to NaNs
 filtered_data(exceeding_channels,:) = NaN;
 rejected_on_step_3                  = exceeding_channels;
+
+
+
