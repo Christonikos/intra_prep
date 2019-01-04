@@ -1,4 +1,4 @@
-function [filtered_data, allchannels, rejected_on_step_2] = variance_thresholding(filtered_data, allchannels, args)
+function [filtered_data, rejected_channels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, rejected_channels, args)
 
 % Get the variance of all channels
 disp([newline 'Detecting the variance of all channels : '])
@@ -7,7 +7,8 @@ dataVariance    = zeros(1,size(filtered_data,1));
 for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
-disp(['Done'])
+
+disp(['Variance calcs have been completed'])
 
 switch args.preferences.visualization
     case true
@@ -53,7 +54,7 @@ spottedChannels             = sort([spottedChannels_negative spottedChannels_pos
 disp([ 'In total ' num2str(length(spottedChannels)) ' channels' ...
     ' have been removed based on the variance of the all channels.']);
 % Update the logical channel variable
-allchannels(spottedChannels') = false;
+rejected_channels(spottedChannels') = false;
 
 if args.preferences.visualization
     % Plot the bad channels
@@ -86,7 +87,7 @@ if args.preferences.visualization
     close all
 end
 % Set the rejected channels to NaNs
-filtered_data(~allchannels,:)   =   NaN;
+
+filtered_data(~rejected_channels,:) =   NaN;
+
 rejected_on_step_2              =   spottedChannels';
-
-

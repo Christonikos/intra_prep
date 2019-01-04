@@ -20,9 +20,9 @@ checkField(P,'datatype' ,'Blackrock');
 checkField(P,'session'  ,'s1')
 
 %% General settings:
-settings.path2rawdata   = fullfile(P.root_path,'data',   P.hospital , P.patient, P.session, filesep); % Path to raw-data folder
-settings.path2figures   = fullfile(P.root_path,'figures',P.hospital , P.patient, P.session, filesep); % Path to Figures folder
-settings.path2output    = fullfile(P.root_path,'output', P.hospital , P.patient, P.session, filesep); % Path to output folder
+settings.path2rawdata   = fullfile(P.root_path,'Data',   P.hospital , P.patient, 'Raw', P.session, filesep); % Path to raw-data folder
+settings.path2figures   = fullfile(P.root_path,'Figures',P.hospital , P.patient, P.session, filesep); % Path to Figures folder
+settings.path2output    = fullfile(P.root_path,'Output', P.hospital , P.patient, P.session, filesep); % Path to output folder
 
 % Append info to settings object:
 settings.root_path  =    P.root_path;

@@ -1,4 +1,4 @@
-function [filtered_data, args] =  filter_linenoise(raw_data, args)
+function filtered_data =  filter_linenoise(raw_data, args)
 % filter_linenoise : filters for line-noise and first two harmonics.
 %                    (optional) - downsamples to user specified ratio.
 % INPUTS    : 
@@ -11,8 +11,6 @@ function [filtered_data, args] =  filter_linenoise(raw_data, args)
 %                                                           @load_settings_args.params.m
 % OUTPUTS   :           
 %                       1. filtered_data        : Matrix -  Data in format [channels x time]. 
-%                       2. args                 : Struct -  In case of downsampling, we have 
-%                                                           an updated sampling rate.
 % -----------------------------------------------------------------------------------------------------------------------------
 
 %% variables intialization
@@ -59,7 +57,7 @@ for channel = 1:(channels)
 end
 % release RAM
 clear signal
-textprogressbar([newline 'Line noise removal has been completed.'])
+textprogressbar([newline 'ine noise removal has been completed.'])
 %% Output checks :
 if ~size(filtered_data,2) > size(filtered_data,1)
     try % this might lead to memory overload

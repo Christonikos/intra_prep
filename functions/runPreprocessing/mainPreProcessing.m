@@ -1,4 +1,4 @@
-function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, args)
+function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args)
 % This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
@@ -36,8 +36,7 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %
 % Written by : Christos Nikolaos Zacharopoulos and Yair Lakretz @UNICOG 2018.
 % ------------------------------------------------------------------------------------------------------------------%
-% Keep the workspace clean.
-clearvars -except P settings raw_data params args 
+
 % Input checks :
 if ~size(raw_data,2) > size(raw_data,1)
     try
@@ -52,7 +51,10 @@ end
 %       1 == non rejected channel.
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
-channel_index            =   true(size(raw_data,1),1);
+num_tests = 3;
+% if args.preferences.run_power_spectrum_test; num_tests = 4; end
+rejected_channels         =   true(size(raw_data,1),num_tests);
+
 %% ---------------------------------  STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
 [filtered_data, args]    =   filter_linenoise(raw_data, args);
 % After this step, the data are :
@@ -62,32 +64,32 @@ channel_index            =   true(size(raw_data,1),1);
 %    Removal of channels based on the variance of the raw power.
 %    This step will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-[filtered_data, channel_index, rejected_on_step_2]  =   variance_thresholding(filtered_data, channel_index, args);
+[filtered_data, rejected_channels]  =   variance_thresholding(filtered_data, labels, rejected_channels, args);
 %%  --------------------------------- STEP 3 - SPIKES DETECTION          ---------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-[filtered_data, channel_index, rejected_on_step_3]  =   spike_detection(filtered_data, channel_index, args);
+[filtered_data, rejected_channels]  =   spike_detection(filtered_data, labels, rejected_channels, args);
 %%  ---------------------------- STEP 4 - REJECTION BASED ON FREQUENCY CONTENT ----------------------------- %%
-[filtered_data, channel_index, rejected_on_step_4]  =   rejection_based_on_powerspectrum(filtered_data, labels, channel_index, args);
+[filtered_data, rejected_channels]  =   rejection_based_on_powerspectrum(filtered_data, labels, rejected_channels, args);
 
 % Provide a summary from step 1 to 4 to the user :
 disp([newline newline                                                                       ...
-    'So far,  ' num2str(length(find(~channel_index)))                                       ...
-    ' channels have been rejected out of the total ' num2str(size(channel_index,1)) '.'     ...
+    'So far,  ' num2str(length(find(~rejected_channels)))                                       ...
+    ' channels have been rejected out of the total ' num2str(size(rejected_channels,1)) '.'     ...
     newline  newline                                                                        ...
-    num2str(length(rejected_on_step_2)) ' of them have been rejected based on raw power  '  ...
-    newline num2str(length(rejected_on_step_3)) ' due to detected spiking activity.'        ...
-    newline num2str(length(rejected_on_step_4)) ' due to deviation on the power-spectrum.'  ...
+    num2str(size(rejected_channels(:, 1))) ' of them have been rejected based on raw power  '  ...
+    newline num2str(length(rejected_channels)) ' due to detected spiking activity.'        ...
+    newline num2str(length(rejected_channels)) ' due to deviation on the power-spectrum.'  ...
     newline newline])
 pause(3);
 
 if args.preferences.hfo_detection
     %%  ---------------------------- STEP 5 - REJECTION BASED ON HFOs ----------------------------- %%
-    [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels , channel_index, args);
+    [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels , rejected_channels, args);
 end
 %% VIZUALIZE REJECTED CHANNELS %% 
 if args.preferences.vizualization
-    plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, channel_index, labels);
+    plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, rejected_channels, labels);
 end
 %%  ---------------------------- STEP 6 - LINEAR DE-TRENDING        ----------------------------- %%
 filtered_data = data_detrending(filtered_data);
@@ -95,11 +97,8 @@ filtered_data = data_detrending(filtered_data);
 
 
 % Export the logical array of the channels
-indexofcleandata                        =   channel_index;
+indexofcleandata                        =   rejected_channels;
 % Export a struct that contains the individual rejection reasons
 rejectedchannels.variance_rejection     =   rejected_on_step_2';
 rejectedchannels.spiking_channels       =   rejected_on_step_3;
 rejectedchannels.power_spectrum         =   rejected_on_step_4;
-
-
-
