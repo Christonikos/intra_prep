@@ -57,7 +57,7 @@ for channel = 1:(channels)
 end
 % release RAM
 clear signal
-textprogressbar([newline 'Line noise removal has been completed.'])
+textprogressbar([newline 'ine noise removal has been completed.'])
 %% Output checks :
 if ~size(filtered_data,2) > size(filtered_data,1)
     try % this might lead to memory overload

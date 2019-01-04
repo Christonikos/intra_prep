@@ -15,11 +15,14 @@
 %   OUTPUTS :
 %                   1. raw_data         : Matrix  -   Dimensions [Channels x time]
 %
-%                   2. channels         : Double  -   Number of channels used in the current raw file.
+%                   2. Labels           : Cell of strings - labels of all
+%                                           channels
+%
+%                   3. num_channels         : Double  -   Number of channels used in the current raw file.
 %
 
 % ---------------------------------------------------------------------------------------------------------------
-function [raw_data, channels] = load_raw_data(args)
+function [raw_data, labels, num_channels] = load_raw_data(args)
 
 disp([newline '---------- Loading the raw data -------------' ...
     newline newline ...
@@ -28,6 +31,7 @@ disp([newline '---------- Loading the raw data -------------' ...
     'Datatype           : ' args.settings.datatype '.' newline ...
     newline   '-----------------------------------------'])
 
+raw_data = []; labels = {};
 % switch datatype
 switch args.settings.datatype
     case 'Blackrock'
@@ -65,23 +69,25 @@ switch args.settings.datatype
         if ~(size(raw_data,2) > size(raw_data,1))
             error('Wrong dimensions!')
         end
-        channels = size(raw_data,1);
+        num_channels = size(raw_data,1);
        
         
 
     case 'Neuralynx'
-        raw_data = []; labels = [];
         ncs_files = dir(fullfile(args.settings.path2rawdata, '*.ncs'));
-        channels=0;
+        num_channels=0;
         for ncs_file_name=ncs_files'
+            num_channels = num_channels+1;
             file_name = ncs_file_name.name;
             ncs_file = fullfile(args.settings.path2rawdata,file_name);
-            fprintf('Channel #%i Reading file %s\n', channels+1, ncs_file)
+            fprintf('Channel #%i Reading file %s\n', num_channels, ncs_file)
             [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples, Samples, Header] = Nlx2MatCSC_v3(ncs_file,[1 1 1 1 1],1,1,1);
             data=reshape(Samples,1,size(Samples,1)*size(Samples,2));
             data=int16(data);
             raw_data = [raw_data; data];
+            labels{num_channels} = file_name;
             %             samplingInterval = 1000/SampleFrequencies(1);
-            channels = channels+1;
+            
+            
         end
 end
