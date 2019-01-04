@@ -1,39 +1,14 @@
-function [settings, params, preferences, P] = load_settings_params(P)
-% -------------------------------------
-% function args = load_settings_params(P)
-% --------------------------------------
+function args = load_settings_params(P)
 
 % load_settings_params : Add the paths to the Data and the various
 % toolboxes needed for the analysis.
 %       INPUTS  :   varargin
 %
-%       OUTPUTS : 
-%                   1. settings        : Struct - Holds the paths to
-%                                                 various locations such as the data directory etc.
-%                   2. params          : Struct - Holds various hospital-specific information such as the
-%                                                 soa of the paradigm and the notch filtering parameters.
-%                   3. preferences     : Struct - Returns the preferences
-%                                                 struct including the following fields :
-%                                                 3.1 : median threshold -
-%                                                 This threshold will be
-%                                                 later used on the
-%                                                 rejection of channels
-%                                                 based on non-pathological
-%                                                 reasons.
-%                                                 3.2 : spiking threshold -
-%                                                 This threshold will be
-%                                                 used to to detect spikes
-%                                                 (abrupt voltage changes)
-%                                                 in the signal.
-%                                                 3.3 : visualization -
-%                                                 "true"/"false" : The option "true"
-%                                                 allows for visualization of the
-%                                                 rejected electrodes at each stage
-%                                                 of the pipeline.
+%       OUTPUTS :   args               : Struct - with the following fields
+%                   1. settings        : Struct - paths and general info
+%                   2. params          : Struct - parameters of the paradigm and filtering
+%                   3. preferences     : Struct - flags for what to execute 
 %
-%                   4.P                : Struct - Holds generic arguments
-%                                                 such as the root path, 
-%                                                 the datatype and the session.
 % ---------------------------------------------------------------------------------------------
 P = parsePairs(P);
 %% -------- Default arguments -------- %%
@@ -78,6 +53,9 @@ preferences.down_sample_data        = true;
 preferences.filter_sub_harmonics    = false;
 preferences.hfo_detection           = false;
 
+%% Append to args struct:
 args.settings = settings;
 args.params = params;
 args.prefernces = preferences;
+
+end
