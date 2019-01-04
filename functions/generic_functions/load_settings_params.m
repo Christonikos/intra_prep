@@ -51,7 +51,7 @@ params.jump_rate_thresh             = 1;      % [Hz] For spike detection (stage 
 
 %% Preferences
 preferences.visualization           = false;
-preferences.down_sample_data        = true;
+preferences.down_sample_data        = false;
 preferences.filter_sub_harmonics    = false;
 preferences.hfo_detection           = false;
 
