@@ -1,48 +1,18 @@
-function [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels, channel_index, params)
-% Provide feedback to the user.
-disp([newline                                                               ...
-    '---------------- Intiating Stage 4 of the analysis ---------------- '  ...
-    newline                                                                 ...
-    '(Rejection of channels based on the detection of HFOs)'                ...
-    newline newline                                                         ...
-    ])
+function rejected_channels  = rejection_based_on_hfos(filtered_data,labels, rejected_channels, args)
 
-% Manually set the detection threshold
-detection_threshold = 1.5;
-[pathological_chan_id,pathological_event, ~] =                              ...
-    detect_paChan(filtered_data,labels, params, detection_threshold);
+test_number = 4;
+% Get the variance of all channels
+disp([newline 'test #4 : Rejection based on detection of HFOs.'])
 
-% Provide feedback to the user
-if  isempty(pathological_chan_id)
-    disp([newline 'From the process of identifying HFOs, ' num2str(0)       ...
-        ' channels have been excluded.'])
-    % --------  Provide the summ-up for the current epoch -------- %
-    clc;
-    disp([newline newline 'So far,  ' num2str(length(find(~channel_index)))                         ...
-        ' channels have been rejected out of the total ' num2str(channels) '.' newline newline      ...
-        num2str(length(spottedChannels)) ' of them have been rejected based on raw power  '         ...
-        newline  num2str(length(exceeding_channels)) ' due to detected spiking activity ' newline   ...
-        num2str(length(pwschannels)) ' due to deviant behavior in the powerspectrum.' newline       ...
-        num2str(0) ' due to the presence of HFos.' newline newline])
-    pause(3)
-    
-else
-    disp([newline 'From the process of identifying HFOs, ' num2str(length(pathological_chan_id)) ...
-        'channels have been excluded.'])
-    
-    % Update the channels logical array
-    channel_index(pathological_chan_id') = false;
-    % Update the channels matrix
-    filtered_data(pathological_chan_id',:) = NaN;
-    
-    % --------  Provide the summ-up for the current epoch -------- %
-    clc;
-    disp([newline newline 'So far,  ' num2str(length(find(~channel_index)))                         ...
-        ' channels have been rejected out of the total ' num2str(channels) '.' newline newline      ...
-        num2str(length(spottedChannels)) ' of them have been rejected based on raw power  '         ...
-        newline  num2str(length(exceeding_channels)) ' due to detected spiking activity ' newline   ...
-        num2str(length(pwschannels)) ' due to deviant behavior in the powerspectrum.' newline       ...
-        num2str(length(pathological_chan_id)) ' due to the presence of HFos.' newline newline])
-    pause(3)
-    
-end
+%% get the detection threshold
+detection_threshold = args.params.hfo_detection_threshold;
+fs                  = args.params.srate;
+% handle to hfo detection function 
+d = @detect_paChan;
+[deviant_channels, pathological_event, ~] = d(filtered_data,labels, fs, detection_threshold);
+
+% Update the logical channel variable #test 4
+rejected_channels(deviant_channels , test_number) = false;
+
+disp(['In total ' num2str(length(deviant_channels)) ...
+    ' have been removed due to spiking activity.'])

@@ -31,9 +31,10 @@ args = load_settings_params(varargin);
 [raw_data, labels, channels]   = load_raw_data(args);
 fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
 %% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
-[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args);
-
-%% TODO: Save the filtered data into a new folder
+[filtered_data , rejected_channels] = mainPreProcessing(raw_data, labels, args);
+%% -----------  EXPORT DATA AND LOG-FILE        ----------- %
+% release RAN
+clear raw_data
 
 
 

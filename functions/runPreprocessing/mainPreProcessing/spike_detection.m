@@ -1,6 +1,8 @@
-function [filtered_data, allchannels, rejected_on_step_3] = spike_detection(filtered_data, allchannels, args)
+function rejected_channels = spike_detection(filtered_data, rejected_channels, args)
 
+disp([newline 'test #2 : Detection of spiking channels.'])
 
+test_number = 2;
 % Set a threshold (in mV)
 jump_threshold = args.params.spikingthreshold;
 % Initialize variable to hold the channels that will be rejected
@@ -31,30 +33,33 @@ switch args.preferences.visualization
         grid on
         grid minor
         pause(5)
-        
         file_name = ['SpikingChannels_', args.settings.patient , '.png'];
         saveas(f, fullfile(args.settings.path2figures, file_name), 'png')
         close(f)
 end
-% Only keep voltage jumps that exceed the average fluctuation
+
+%% Only keep voltage jumps that exceed the jumping threshold
 rec_duration_sec    = floor(rec_duration/args.params.srate);
 jump_rate           = nr_jumps/rec_duration_sec;
-exceeding_channels  = find(jump_rate > args.params.jump_rate_thresh);
+deviant_channels    = find(jump_rate > args.params.jump_rate_thresh);
 
-disp(['In total ' num2str(length(exceeding_channels)) ...
+% Update the logical channel variable #test 2
+rejected_channels(deviant_channels , test_number) = false;
+
+disp(['In total ' num2str(length(deviant_channels)) ' channels'...
     ' have been removed due to spiking activity.'])
 
 if args.preferences.visualization
     % Plot the spike-plot
     figureDim = [0 0 1 1];
     f = figure('units', 'normalized', 'outerposition', figureDim);
-    for spikeCh = 1:length(exceeding_channels)
-        plot(zscore(filtered_data(exceeding_channels(spikeCh),:)))
+    for spikeCh = 1:length(deviant_channels)
+        plot(zscore(filtered_data(deviant_channels(spikeCh),:)))
         title(['Channel Index : ' ...
-            num2str(exceeding_channels(spikeCh))],'Interpreter','none')
+            num2str(deviant_channels(spikeCh))],'Interpreter','none')
         xlabel('time [samples]')
         ylabel('z-score')
-        legend(['Channel ' num2str(spikeCh) '/' num2str(length(exceeding_channels)) newline '' ] ...
+        legend(['Channel ' num2str(spikeCh) '/' num2str(length(deviant_channels)) newline '' ] ...
             ,'Location','northeastoutside')
         grid on
         grid minor
@@ -63,11 +68,6 @@ if args.preferences.visualization
     close(f)
 end
 
-% Update the logical channel variable and remove the trigger channel
-allchannels(exceeding_channels)     = false;
-% Set the rejected channels to NaNs
-filtered_data(exceeding_channels,:) = NaN;
-rejected_on_step_3                  = exceeding_channels;
 
 
 

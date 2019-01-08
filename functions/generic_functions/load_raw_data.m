@@ -53,6 +53,7 @@ switch args.settings.datatype
                     end
             end
             ns3_files{file_id} = data;
+            lab_files{file_id} = {NS3.ElectrodesInfo.Label}';
             % release memory
             clear data files files_len
         end
@@ -65,6 +66,7 @@ switch args.settings.datatype
         end
         % concatenate the two files into a single variable: 
         raw_data = [ns3_files{1}; ns3_files{2}];
+        labels   = [lab_files{1}; lab_files{2}];
         %% Output check
         if ~(size(raw_data,2) > size(raw_data,1))
             error('Wrong dimensions!')
