@@ -7,7 +7,7 @@ ntests          = size(rejected_channels,2);
 curr_session    = args.settings.path2output(end-2:end-1); % to do : add the current session in args
 curr_patient    = args.settings.patient;
 file_name       = fullfile(args.settings.path2output, ...
-    join(['testlog_', curr_session,'_',curr_patient,'.txt']));
+    join(['rejected_channels_by_test_', curr_session,'_',curr_patient,'.txt']));
 % loop through number of tests
 for t_id = 1:ntests
     if t_id ==1; p = 'w'; else p = 'a'; end         % p = permission;
