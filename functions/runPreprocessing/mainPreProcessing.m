@@ -1,16 +1,16 @@
-function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args)
+function [filtered_data , rejected_channels, args] = mainPreProcessing(raw_data, labels, args)
 % This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
 %    INPUTS :          
 %                       1. raw_data             : Matrix -  Data in format [channels x time]. Within the UNICOG pipeline, this
-%                                                   variable has been created using the function load_raw_data. It is
-%                                                   advised that you provide the data chunked, to avoid nemory problems
+%                                                           variable has been created using the function load_raw_data. It is
+%                                                           advised that you provide the data chunked, to avoid nemory problems
 %
 %
 %                       2. args                 : Struct -  The main configuration
-%                                                   struct constructed
-%                                                   @load_settings_args.params.m
+%                                                           struct constructed
+%                                                           @load_settings_args.params.m
 %
 %   OUTPUTS : 
 %                       1. filtered_data        : Matrix - Data in format [channels x time]. Rejection of channels based on : 
@@ -26,18 +26,19 @@ function [filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessin
 %                                                       channels are linearly de-trended, downsampled to 1KHz and notch
 %                                                       filtered for line noise and harmonics.
 %
-%                        2. indexofcleandata : Logical array - [channels x 1]. 
-%                                                               1 == non rejected channel 
-%                                                               0 == rejected channel 
+%                        
+%                       2. rejectedchannels : Struct - Each field contains
+%                                                      the indices of the rejected channels per TEST (see
+%                                                      output 1).
 %
-%                        3. rejectedchannels : Struct - Each field contains
-%                                                       the indices of the rejected channels per step (see
-%                                                       output 1).
+%                       3. args             : Struct - In case of downsampling, we have 
+%                                                      an updated sampling rate.
+%  
 %
 % Written by : Christos Nikolaos Zacharopoulos and Yair Lakretz @UNICOG 2018.
 % ------------------------------------------------------------------------------------------------------------------%
 
-% Input checks :
+%% Input checks :
 if ~size(raw_data,2) > size(raw_data,1)
     try
         raw_data = raw_data';
@@ -46,59 +47,45 @@ if ~size(raw_data,2) > size(raw_data,1)
         return;
     end
 end
-%% ---------------------------------  STEP 0 - VARIABLE INITIALIZATION   ---------------------------------- %%
+
+%% Variables initialization
 % Create a channel log-file. This will be a logical array where :
 %       1 == non rejected channel.
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
-num_tests = 3;
-% if args.preferences.run_power_spectrum_test; num_tests = 4; end
+if args.preferences.hfo_detection; num_tests = 4; else num_tests = 3; end
+
 rejected_channels         =   true(size(raw_data,1),num_tests);
 
-%% ---------------------------------  STEP 1 - FILTERING AND DOWNSAMPLING --------------------------------- %%
+%% Filtering and downsampling
 [filtered_data, args]    =   filter_linenoise(raw_data, args);
-% After this step, the data are :
+% After this TEST, the data are :
 % 1. Notch filtered for line noise and harmonics.
 % 2. Downsampled to the specified ratio.
-%% ---------------------------------  STEP 2 - VARIANCE THRESHOLDING      --------------------------------- %%
+% release RAM 
+clear raw_data
+%% ---------------------------------  TEST 1 - VARIANCE THRESHOLDING      --------------------------------- %%
 %    Removal of channels based on the variance of the raw power.
-%    This step will track all the channels where the broadband
+%    This TEST will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-[filtered_data, rejected_channels]  =   variance_thresholding(filtered_data, labels, rejected_channels, args);
-%%  --------------------------------- STEP 3 - SPIKES DETECTION          ---------------------------------- %%
+rejected_channels  =   variance_thresholding(filtered_data, rejected_channels, args);
+%%  --------------------------------- TEST 2 - SPIKES DETECTION          ---------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-[filtered_data, rejected_channels]  =   spike_detection(filtered_data, labels, rejected_channels, args);
-%%  ---------------------------- STEP 4 - REJECTION BASED ON FREQUENCY CONTENT ----------------------------- %%
-[filtered_data, rejected_channels]  =   rejection_based_on_powerspectrum(filtered_data, labels, rejected_channels, args);
-
-% Provide a summary from step 1 to 4 to the user :
-disp([newline newline                                                                       ...
-    'So far,  ' num2str(length(find(~rejected_channels)))                                       ...
-    ' channels have been rejected out of the total ' num2str(size(rejected_channels,1)) '.'     ...
-    newline  newline                                                                        ...
-    num2str(size(rejected_channels(:, 1))) ' of them have been rejected based on raw power  '  ...
-    newline num2str(length(rejected_channels)) ' due to detected spiking activity.'        ...
-    newline num2str(length(rejected_channels)) ' due to deviation on the power-spectrum.'  ...
-    newline newline])
-pause(3);
-
+rejected_channels  =   spike_detection(filtered_data,rejected_channels, args);
+%%  --------------------------------- TEST 3 - REJECTION BASED ON FREQUENCY CONTENT ----------------------- %%
+rejected_channels  =   rejection_based_on_powerspectrum(filtered_data, rejected_channels, args);
 if args.preferences.hfo_detection
-    %%  ---------------------------- STEP 5 - REJECTION BASED ON HFOs ----------------------------- %%
-    [pathological_chan_id,pathological_event]  = rejection_based_on_hfos(filtered_data,labels , rejected_channels, args);
+    %%  ----------------------------  TEST 4 - REJECTION BASED ON HFOs ----------------------------- %%
+    rejected_channels  = rejection_based_on_hfos(filtered_data,labels, rejected_channels, args);
 end
-%% VIZUALIZE REJECTED CHANNELS %% 
-if args.preferences.vizualization
-    plot_bad_channels(rejected_on_step_2, rejected_on_step_3, rejected_on_step_4, raw_data, rejected_channels, labels);
-end
-%%  ---------------------------- STEP 6 - LINEAR DE-TRENDING        ----------------------------- %%
+%% Linear detrending
 filtered_data = data_detrending(filtered_data);
 
+%% VIZUALIZE REJECTED CHANNELS %% 
+if args.preferences.visualization
+    plot_bad_channels(filtered_data, rejected_channels);
+end
 
 
-% Export the logical array of the channels
-indexofcleandata                        =   rejected_channels;
-% Export a struct that contains the individual rejection reasons
-rejectedchannels.variance_rejection     =   rejected_on_step_2';
-rejectedchannels.spiking_channels       =   rejected_on_step_3;
-rejectedchannels.power_spectrum         =   rejected_on_step_4;
+

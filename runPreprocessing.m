@@ -8,14 +8,12 @@
 % This is a plug-and-play function, to change any input variable, provide it
 % as a pair-input  in the command window.
 % example : 
-% runPreprocessing('patients',{'TS096'},'medianthreshold',4,'spikingthreshold',80);
+% runPreprocessing('patients','TS096','medianthreshold',4,'spikingthreshold',80);
 % --------------------------------------------------------------------------------------------------
 function runPreprocessing(varargin)
 %% -----------  BRANCH 1 - SET AND ADD PATHS ----------- %
-% In this branch we define the paths for the user.
-clc;  close all;
 % Keep the workspace clean
-clearvars -except varargin
+clearvars -except varargin; clc; close all;
 %Check whether the debug mode is on
 if feature('IsDebugMode')
     dbquit all
@@ -31,9 +29,14 @@ args = load_settings_params(varargin);
 [raw_data, labels, channels]   = load_raw_data(args);
 fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
 %% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
-[filtered_data , indexofcleandata, rejectedchannels] = mainPreProcessing(raw_data, labels, args);
+[filtered_data , rejected_channels, args] = mainPreProcessing(raw_data, labels, args);
+clear raw_data % release RAM
+%% -----------  EXPORT DATA AND LOG-FILE        ----------- %
+% save log file to output folder
+save_logfile(rejected_channels, args)
+% save filtered data to output folder
+export_channels(filtered_data, args)
 
-%% TODO: Save the filtered data into a new folder
 
 
 

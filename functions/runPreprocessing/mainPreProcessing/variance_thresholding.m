@@ -1,14 +1,14 @@
-function [filtered_data, rejected_channels, rejected_on_step_2] = variance_thresholding(filtered_data, labels, rejected_channels, args)
+function rejected_channels = variance_thresholding(filtered_data, rejected_channels, args)
 
+test_number = 1;
 % Get the variance of all channels
-disp([newline 'Detecting the variance of all channels : '])
+disp([newline 'test #1 : Rejection based on variance of all channels.'])
 % Pre-allocate the variance variable
 dataVariance    = zeros(1,size(filtered_data,1));
 for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
 
-disp(['Variance calcs have been completed'])
 
 switch args.preferences.visualization
     case true
@@ -47,20 +47,21 @@ end
 medianthreshold             = args.params.medianthreshold;
 % Detect those channels that exceed 5 times the median of the
 % detected variance (in both directions) 
-spottedChannels_positive    = find(dataVariance > (medianthreshold * median(dataVariance)));
-spottedChannels_negative    = find(dataVariance < (median(dataVariance)/medianthreshold));
+deviant_positive    = find(dataVariance > (medianthreshold * median(dataVariance)));
+deviant_negative    = find(dataVariance < (median(dataVariance)/medianthreshold));
 % Concatenate the detected channels
-spottedChannels             = sort([spottedChannels_negative spottedChannels_positive]);
-disp([ 'In total ' num2str(length(spottedChannels)) ' channels' ...
+deviant_channels            = sort([deviant_negative deviant_positive]);
+disp([ 'In total ' num2str(length(deviant_channels)) ' channels' ...
     ' have been removed based on the variance of the all channels.']);
-% Update the logical channel variable
-rejected_channels(spottedChannels') = false;
+
+% Update the logical channel variable #test 1
+rejected_channels(deviant_channels',test_number) = false;
 
 if args.preferences.visualization
     % Plot the bad channels
     figureDim = [0 0 1 1];
     figure('units', 'normalized', 'outerposition', figureDim)
-    for bch = 1:length(spottedChannels)
+    for bch = 1:length(deviant_channels)
         if bch == 1
             t = text(0.5,0.5,'These are the channels rejected from step 1');
             t.BackgroundColor = 'k';
@@ -73,21 +74,16 @@ if args.preferences.visualization
             axis off;
             pause(3)
         end
-        plot(zscore(filtered_data(spottedChannels(bch),:)))
+        plot(zscore(filtered_data(deviant_channels(bch),:)))
         title(['Channel Index : ' ...
-                num2str(spottedChannels(bch))],'Interpreter','none') %#ok<NODEF>
+                num2str(deviant_channels(bch))],'Interpreter','none') %#ok<NODEF>
         xlabel('Time [samples]')
         ylabel('zscore')
         grid on
         grid minor
-        legend(['Channel ' num2str(bch) '/' num2str(length(spottedChannels)) newline '' ] ...
+        legend(['Channel ' num2str(bch) '/' num2str(length(deviant_channels)) newline '' ] ...
             ,'Location','northeastoutside')
         pause(5)
     end
     close all
 end
-% Set the rejected channels to NaNs
-
-filtered_data(~rejected_channels,:) =   NaN;
-
-rejected_on_step_2              =   spottedChannels';

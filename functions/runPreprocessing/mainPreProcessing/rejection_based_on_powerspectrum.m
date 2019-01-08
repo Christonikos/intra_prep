@@ -1,13 +1,8 @@
-function [filtered_data, channel_index, rejected_on_step_4]  = rejection_based_on_powerspectrum(filtered_data, labels, channel_index, params)
+function rejected_channels  = rejection_based_on_powerspectrum(filtered_data,rejected_channels, args)
 
-% Provide feedback to the user.
-disp([newline...
-    '---------------- Intiating Stage 4 of the analysis ---------------- ' ...
-    newline ...
-    '(Rejection of channels based on deviation on the PowerSpectrum)'...
-    newline newline])
-channels    = size(filtered_data,1);
-
+disp([newline 'test #3 : Detecting deviant channels in the freq domain.'])
+test_number = 3;
+channels    = size(rejected_channels,1);
 %% ----- SET POWERSPECTRUM PARAMETERS ----- %%
 set_ov      = 0; % overlaping window
 f           = 0:250; % frequency axis
@@ -19,8 +14,8 @@ timecount   = linspace(1,100,(channels));
 % loop through channels
 for chanID = 1:(channels)
     textprogressbar(timecount(chanID))
-    [Pxx,f] = pwelch(filtered_data(chanID,1:100*params.srate), ...
-        params.srate, set_ov, f, params.srate);
+    [Pxx,f] = pwelch(filtered_data(chanID,1:100*args.params.srate), ...
+        args.params.srate, set_ov, f, args.params.srate);
     data_pxx(chanID,:) = Pxx;
 end
 textprogressbar([ newline 'Estimation completed'])
@@ -62,12 +57,12 @@ while true
     user_response = input(prompt,'s');
     if strcmp(user_response,'N')
         disp('No extra channels were added')
-        pwschannels = [];
+        deviant_channels = [];
         break
     elseif strcmp(user_response,'Y')
         secondprompt = ('Please add the channels using space between them and press enter when you are done : ');
-        pwschannels = input(secondprompt,'s');
-        pwschannels = str2num(pwschannels);
+        deviant_channels = input(secondprompt,'s');
+        deviant_channels = str2num(deviant_channels);
         break
     else
         disp('Please only add numerical values')
@@ -76,20 +71,8 @@ while true
     % Based on the user response update or not the channels
 end
 
-if ~isempty(pwschannels)
-    % Set the rejected channels to NaNs
-    filtered_data((pwschannels),:) = NaN;
-    % Provide update including step number 3
-    channel_index(pwschannels) = false;
-end
+disp(['In total ' num2str(length(deviant_channels)) ' channels'...
+    ' have been removed based on the power spectrum.'])
 
-
-clc;
-
-disp(['In total ' num2str(length(pwschannels)) ...
-    ' have been removed due to spiking activity.'...
-    newline ' The channels have the following labels : '  ])
-disp(labels(pwschannels,:))
-pause(3)
-
-rejected_on_step_4 = pwschannels;
+% Update the logical channel variable #test 3
+rejected_channels(deviant_channels',test_number) = false;
