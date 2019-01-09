@@ -54,16 +54,20 @@ end
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
 if args.preferences.hfo_detection; num_tests = 4; else num_tests = 3; end
-
 rejected_channels         =   true(size(raw_data,1),num_tests);
 
 %% Filtering and downsampling
 [filtered_data, args]    =   filter_linenoise(raw_data, args);
-% After this TEST, the data are :
+% After this stage, the data are :
 % 1. Notch filtered for line noise and harmonics.
 % 2. Downsampled to the specified ratio.
 % release RAM 
 clear raw_data
+
+%% Linear detrending
+filtered_data = data_detrending(filtered_data);
+
+
 %% ---------------------------------  TEST 1 - VARIANCE THRESHOLDING      --------------------------------- %%
 %    Removal of channels based on the variance of the raw power.
 %    This TEST will track all the channels where the broadband
@@ -79,8 +83,6 @@ if args.preferences.hfo_detection
     %%  ----------------------------  TEST 4 - REJECTION BASED ON HFOs ----------------------------- %%
     rejected_channels  = rejection_based_on_hfos(filtered_data,labels, rejected_channels, args);
 end
-%% Linear detrending
-filtered_data = data_detrending(filtered_data);
 
 %% VIZUALIZE REJECTED CHANNELS %% 
 if args.preferences.visualization

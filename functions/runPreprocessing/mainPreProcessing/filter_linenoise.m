@@ -20,17 +20,21 @@ channels = size(raw_data,1);
 % used in the progress bar.
 timecount       = linspace(1,100,size(raw_data,1));
 
-%% ----------- FILTERING AND DOWNSAMPLING ----------- %%
+%% ----------- DOWNSAMPLING ----------- %%
 % Downsample data
 if args.preferences.down_sample_data
+    ratio = args.params.downsampling_ratio;
+    sr_i = args.params.srate ;
+    sr_f = (sr_i./ ratio); 
     clear textprogressbar
-    textprogressbar([newline 'Downsampling all channels: ']);
+    textprogressbar([newline 'Downsampling from ' ...
+        num2str(sr_i) ' Hz to ' num2str(sr_f) ' Hz: ']);
     for channel = 1:(channels)
         textprogressbar(timecount(channel));
-        signal(channel,:)   = downsample(raw_data(channel,:),args.params.downsampling_ratio,0); % downsample per channel
+        signal(channel,:)   = downsample(raw_data(channel,:),ratio,0); % downsample per channel
     end
     % update the sampling rate
-    args.params.srate   = args.params.srate./args.params.downsampling_ratio;
+    args.params.srate   = sr_f;
     duration            = size(signal,2);
     filtered_data       = zeros(channels,duration);
 else
@@ -41,7 +45,16 @@ end
 % release RAM
 clear raw_data textprogressbar
 
-textprogressbar([newline 'Removing line noise and harmonics from all channels : ']);
+
+
+%% ----------- FILTERING ----------- %%
+line_noise      = num2str(args.params.first_harmonic{1} +1);
+first_harmonic  = num2str(args.params.second_harmonic{1}+1);
+third_harmonic  = num2str(args.params.third_harmonic{1} +1);
+
+textprogressbar([newline 'Removing line noise and harmonics (' line_noise ',' ...
+   first_harmonic ','  third_harmonic ' Hz): ']);
+   
 % Filter the line noise and the harmonics
 for channel = 1:(channels)
     textprogressbar(timecount(channel));
@@ -58,8 +71,8 @@ for channel = 1:(channels)
     clear wave
 end
 % release RAM
-clear signal
-textprogressbar([newline 'Line noise removal has been completed.'])
+clear signal textprogressbar
+
 %% Output checks :
 if ~size(filtered_data,2) > size(filtered_data,1)
     try % this might lead to memory overload

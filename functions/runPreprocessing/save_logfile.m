@@ -4,10 +4,10 @@ function save_logfile(rejected_channels, args)
 reasons_of_exclusion = {'channel variance : ' 'spikes detection : ' ...
     'powerspectrum deviation : ' 'hfos detecion : '};
 ntests          = size(rejected_channels,2);
-curr_session    = args.settings.path2output(end-2:end-1); % to do : add the current session in args
+curr_session    = args.settings.session; 
 curr_patient    = args.settings.patient;
-file_name       = fullfile(args.settings.path2output, ...
-    join(['rejected_channels_by_test_', curr_session,'_',curr_patient,'.txt']));
+file_name       = fullfile(args.settings.path2deriv.preproc, ...
+    join(['rejected_channels_by_tests_', curr_session,'_',curr_patient,'.txt']));
 % loop through number of tests
 for t_id = 1:ntests
     if t_id ==1; p = 'w'; else p = 'a'; end         % p = permission;

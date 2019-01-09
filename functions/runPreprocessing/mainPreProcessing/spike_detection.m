@@ -1,6 +1,6 @@
 function rejected_channels = spike_detection(filtered_data, rejected_channels, args)
 
-disp([newline 'test #2 : Detection of spiking channels.'])
+
 
 test_number = 2;
 % Set a threshold (in mV)
@@ -11,15 +11,16 @@ channels        = size(filtered_data,1);
 nr_jumps        = zeros(channels,1);
 rec_duration    = size(filtered_data,2);
 
-textprogressbar([newline 'Detecting spiking channels.' newline])
+
 timecount = linspace(1,100,size(filtered_data,1));
-close all;
+close all; clear textprogressbar
+textprogressbar([newline 'test #2 : Channel rejection based on epileptic spiking activity: ' ])
 % Loop through the channels and detect abrupt changes
 for chID = 1:size(filtered_data,1)
     textprogressbar(timecount(chID))
     nr_jumps(chID) = length(find(diff(filtered_data(chID,:)) > jump_threshold));
 end
-textprogressbar([newline 'Detection completed.'])
+
 
 switch args.preferences.visualization
     case true
@@ -46,8 +47,7 @@ deviant_channels    = find(jump_rate > args.params.jump_rate_thresh);
 % Update the logical channel variable #test 2
 rejected_channels(deviant_channels , test_number) = false;
 
-disp(['In total ' num2str(length(deviant_channels)) ' channels'...
-    ' have been removed due to spiking activity.'])
+disp([newline num2str(length(deviant_channels)) ' channels have been removed.'])
 
 if args.preferences.visualization
     % Plot the spike-plot

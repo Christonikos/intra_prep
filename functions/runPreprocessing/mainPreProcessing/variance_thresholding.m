@@ -2,7 +2,8 @@ function rejected_channels = variance_thresholding(filtered_data, rejected_chann
 
 test_number = 1;
 % Get the variance of all channels
-disp([newline 'test #1 : Rejection based on variance of all channels.'])
+disp([newline '-----------------------------------------' ...
+newline 'test #1 : Channel rejection based on signal variance.'])
 % Pre-allocate the variance variable
 dataVariance    = zeros(1,size(filtered_data,1));
 for channel = 1: size(filtered_data,1)
@@ -51,8 +52,7 @@ deviant_positive    = find(dataVariance > (medianthreshold * median(dataVariance
 deviant_negative    = find(dataVariance < (median(dataVariance)/medianthreshold));
 % Concatenate the detected channels
 deviant_channels            = sort([deviant_negative deviant_positive]);
-disp([ 'In total ' num2str(length(deviant_channels)) ' channels' ...
-    ' have been removed based on the variance of the all channels.']);
+disp([num2str(length(deviant_channels)) ' channels have been removed.']);
 
 % Update the logical channel variable #test 1
 rejected_channels(deviant_channels',test_number) = false;
