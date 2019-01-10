@@ -10,40 +10,6 @@ for channel = 1: size(filtered_data,1)
     dataVariance(1,channel) = var(filtered_data(channel,:)');
 end
 
-
-switch args.preferences.visualization
-    case true
-        figureDim = [0 0 1 1];
-        figure('units', 'normalized', 'outerposition', figureDim)
-        subplot(211)
-        bar(dataVariance)
-        grid on
-        grid minor
-        xlabel('channels')
-        ylabel('detected variance')
-        title('Detected variance for all channels')
-        hold on
-        plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-        hold on
-        plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-        legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-        
-        subplot(212)
-        bar(dataVariance)
-        grid on
-        grid minor
-        xlabel('channels')
-        ylabel('detected variance')
-        title('Detected variance for all channels')
-        xlim([0 20])
-        hold on
-        plot([get(gca,'xlim')],[5*median(dataVariance),5*median(dataVariance)],'r','linew',1.2)
-        hold on
-        plot([get(gca,'xlim')],[median(dataVariance)/5,median(dataVariance)/5],'m','linew',1.2)
-        legend('detected variance','5*median','median/5','Location',  'northeastoutside')
-        pause(10)
-        close all
-end
 % Set the cutting threshold
 medianthreshold             = args.params.medianthreshold;
 % Detect those channels that exceed 5 times the median of the
@@ -57,6 +23,59 @@ disp([num2str(length(deviant_channels)) ' channels have been removed.']);
 % Update the logical channel variable #test 1
 rejected_channels(deviant_channels',test_number) = false;
 
+
+%% FIGURES 
+
+% ---------------------- 1. signal variance figure ----------------------% 
+% check if the dir exists, else create it. 
+% check if the directory exists-else create it
+dir2save = args.settings.path2figures;
+if ~exist(string(dir2save),'dir'); mkdir(dir2save); end
+switch args.preferences.visualization
+    case true
+        f1 = figure('Color',[1 1 1],'visible','on');
+    case false
+        f1 = figure('Color',[1 1 1],'visible','off');
+end
+% channels above the median threshold
+subplot(211)
+bar(dataVariance)
+grid on
+grid minor
+xlabel('channels')
+ylabel('detected variance')
+title('Detected variance for all channels')
+hold on
+plot([get(gca,'xlim')],[medianthreshold*median(dataVariance),medianthreshold*median(dataVariance)],'r','linew',1.2)
+hold on
+plot([get(gca,'xlim')],[median(dataVariance)/medianthreshold,median(dataVariance)/medianthreshold],'m','linew',1.2)
+legend('detected variance',[num2str(medianthreshold) '*median'],['median/' num2str(medianthreshold)],'Location',  'northeastoutside')
+% channels below the median threshold
+subplot(212)
+bar(dataVariance)
+grid on
+grid minor
+xlabel('channels')
+ylabel('detected variance')
+title('Detected variance for all channels')
+xlim([0 20])
+hold on
+plot([get(gca,'xlim')],[medianthreshold*median(dataVariance),medianthreshold*median(dataVariance)],'r','linew',1.2)
+hold on
+plot([get(gca,'xlim')],[median(dataVariance)/medianthreshold,median(dataVariance)/medianthreshold],'m','linew',1.2)
+legend('detected variance',[num2str(medianthreshold) '*median'],['median/' num2str(medianthreshold)],'Location',  'northeastoutside')
+switch args.preferences.visualization
+    case true
+        pause(10)
+end
+% Enlarge figure to full screen.
+set(f1, 'units','normalized','outerposition',[0 0 1 1]);
+file_name = ['signal_variance'];
+saveas(f1, fullfile(dir2save, file_name), 'png')
+close(f1)
+% ----------------------------------------------------------------------%
+
+% ---------------------- 2. rejected channels ----------------------% 
 if args.preferences.visualization
     % Plot the bad channels
     figureDim = [0 0 1 1];
@@ -87,3 +106,4 @@ if args.preferences.visualization
     end
     close all
 end
+% ----------------------------------------------------------------------%

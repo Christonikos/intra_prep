@@ -9,7 +9,6 @@ set_ov      = 0; % overlaping window
 f           = 0:250; % frequency axis
 data_pxx    = zeros(channels, length(f));
 
-
 timecount   = linspace(1,100,(channels));
 % loop through channels
 for chanID = 1:(channels)
@@ -18,13 +17,13 @@ for chanID = 1:(channels)
         args.params.srate, set_ov, f, args.params.srate);
     data_pxx(chanID,:) = Pxx;
 end
-
-figureDim = [0 0 1 1];
-figure('units', 'normalized', 'outerposition', figureDim)
 log_data_pxx = log(data_pxx);
 
+% ---------------------- power-spectrum figure ----------------------% 
+dir2save = args.settings.path2figures;
+f1 = figure('Color',[1 1 1],'visible','on');
 for chanID = 1:(channels)
-    plot(f,log_data_pxx(chanID,:),'tag' ...
+    plot(log_data_pxx(chanID,:),'tag' ...
         ,sprintf('Channel %d',chanID));
     grid on
     grid minor
@@ -36,7 +35,12 @@ for chanID = 1:(channels)
         newline '(Click on those channels that you wish to remove )'])
     warning('off','all')
 end
+% Enlarge figure to full screen.
+set(f1, 'units','normalized','outerposition',[0 0 1 1]);
 warning('on','all')
+file_name = 'power_spectrum';
+saveas(f1, fullfile(dir2save, file_name), 'png')
+% ----------------------------------------------------------------------%
 
 % Callback function to get input from the plot
 datacursormode on
@@ -57,7 +61,7 @@ newline 'Please explore the power spectrum to decide about deviant channels.' ne
 prompt = (': ');
 deviant_channels = input(prompt,'s');
 deviant_channels = str2num(deviant_channels);
-
+close(f1)
 disp([num2str(length(deviant_channels)) ' channels  have been removed.'])
 
 % Update the logical channel variable #test 3
