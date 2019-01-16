@@ -4,7 +4,7 @@ function stamp=find_event(data,th,id_type,th_type,reject)
 %          3: if a succesive serie of timestamps are found, get the
 %          central point.
 %   Written by Su Liu
-if nargin <5 || isempty(reject)
+if nargin<5 || isempty(reject)
     if th_type==0
         reject=9;
     else
@@ -20,11 +20,11 @@ end
 % index=find(data>th);
 % index_m=find(data<-th);
 
-% Chris : I transposed the matrices here so that the concatenation can work
-index=sort([find(data>th)' ; find(data<-th)']);
-
-r_ind=[find(data(index)>reject*th)' ; find(data(index)<(-reject*th))'];
-
+index=sort([find(data>th);find(data<-th)]); % C: get samples that exceed the abs value of the threshold 
+% which was set in the previous function to be 5 times the median of the temporal variance. 
+r_ind=[find(data(index)>reject*th);find(data(index)<(-reject*th))]; % C : find the sample points that exceed the reject*thr, that is
+% 5*5thr = 15 times the median of the temporal variance. - This does not
+% look to appear anywhere else. 
 if ~isempty(r_ind)
      index(r_ind)=[];
 end
@@ -36,16 +36,16 @@ count=0;
 if li==0 || li==1
     get_idx=[];
 else   
-    F=find(diff(index)<=100);
-    %F=find(diff(index)<=50);
+    F=find(diff(index)<=100); % Chris : I guess in samples. find sample points that don't have distance greater than 100
+    %F=find(diff(index)<=50); (I guess to identify a single event)
     if ~isempty(F)
         if length(F)==1
             group{1}=index(F:F+1);
         else
-            F(:,2)=F(:,1)+1;
-            for i=1:length(F)-1
-                if F(i,2)~=F(i+1,1)
-                    group{q}=index(F(i-count,1):F(i,2));
+            F(:,2)=F(:,1)+1; % C :get the adjacent samples points 
+            for i=1:length(F)-1  % C: loop through those sample points  
+                if F(i,2)~=F(i+1,1) % C : why is that?
+                    group{q} = index(F(i-count,1):F(i,2)); 
                     index(F(i-count,1):F(i,2))=0;
                     count=0;
                     q=q+1;
@@ -60,11 +60,12 @@ else
                 end
             end
         end
-         atf=zeros(length(group),1);
+         atf=zeros(length(group),1); % C : the length of the group is the events that exceeded 5times the threshold
         if th_type==1
-            for i=1:length(group)
-                if length(group{i})>100 %set the criteria
-                %if length(group{i})>50 %set the criteria
+            for i=1:length(group) 
+                % C : if you have too big or too small events, set them to
+                % 1
+                if length(group{i})>100 %set the criteria 
                     atf(i)=1;
                 elseif length(group{i})<=2%old:10                   
                     atf(i)=1;
@@ -78,16 +79,15 @@ else
                 end
             end
          end
-        group(logical(atf))=[];        
-        get_idx=zeros(length(group),1);
-        for i=1:length(group)
-            
+        group(logical(atf))=[];  %C: keep only the groups that are not too small or too big      
+        get_idx=zeros(length(group),1); % C : initialize again with the non rejected events
+        for i=1:length(group) % C: loop through the groups
             switch id_type
                 case 1
                     get_idx(i,1)=group{i}(1);
                 case 2
+                    % C : get the peaks of the groups
                     get_idx(i,1)=group{i}(data(group{i})==max(data(group{i})));
-
                 case 3
                     get_idx(i,1)=round(median(group{i}));
                 case 4
@@ -121,5 +121,5 @@ else
 stamp=get_idx;
 end
 discard= data(stamp)>reject*th;
-stamp(discard)=[];
+stamp(discard)=[]; % C : 5th< peaks <15th? 
 end

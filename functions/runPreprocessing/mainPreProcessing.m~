@@ -56,10 +56,6 @@ end
 if args.preferences.hfo_detection; num_tests = 4; else num_tests = 3; end
 rejected_channels         =   true(size(raw_data,1),num_tests);
 
-% for debuging : select a sub-set of the data 
-n_seconds = 6e2; % 10 min
-raw_data = raw_data(:,1:args.params.srate*n_seconds);
-
 %% Filtering and downsampling
 [filtered_data, args]    =   filter_linenoise(raw_data, args);
 % After this stage, the data are :
@@ -71,7 +67,9 @@ clear raw_data
 %% Linear detrending
 filtered_data = data_detrending(filtered_data);
 
-
+% for debuging : select a sub-set of the data 
+n_seconds = 6e2; % 10 min
+filtered_data = filtered_data(:,1:args.params.srate*n_seconds);
 
 
 %% ---------------------------------  TEST 1 - VARIANCE THRESHOLDING --------------------------------------- %%

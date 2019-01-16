@@ -9,10 +9,10 @@ threshold   = args.params.hfo_detection_threshold;
 fs          = args.params.srate;
 % handle to hfo detection function 
 d = @find_paChan;
-[pathological_chan_id,~] = d(filtered_data,labels, fs, threshold);
+[pathological_chan_id,pathological_event] = d(filtered_data,labels, fs, threshold);
 
 % Update the logical channel variable #test 4
-rejected_channels(pathological_chan_id' , test_number) = false;
+rejected_channels(deviant_channels , test_number) = false;
 
-disp([newline num2str(length(pathological_chan_id)) ...
-    ' channels have been removed.'])
+disp(['In total ' num2str(length(deviant_channels)) ...
+    ' have been removed due to spiking activity.'])

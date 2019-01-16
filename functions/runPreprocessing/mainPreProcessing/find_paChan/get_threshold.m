@@ -7,7 +7,7 @@ function [v,th]=get_threshold(data,frame,overlap,type,param,input)
 %   Written by Su Liu
 if nargin<6
     input=[];
-elseif ~strcmp(type,'Manual') 
+elseif ~strcmp(type,'Manual')
     input=[];
 elseif input==0
     input=[];
@@ -17,19 +17,19 @@ if strcmp(type,'std')==1
     m=median(v);
 else
     v=temp_variance(data,frame,overlap);
-            switch type
-                case 'Mean'
-                    m=mean(v);
-                case 'Median'
-                    m=median(v);
-                %case 'std'
-                    %m=std(v);
-                case 'Manual'
-                    if ~isempty(input)
-                        th=input;
-                        return;
-                    end
+    switch type
+        case 'Mean'
+            m=mean(v);
+        case 'Median'
+            m=median(v);
+            %case 'std'
+            %m=std(v);
+        case 'Manual'
+            if ~isempty(input)
+                th=input;
+                return;
             end
+    end
 end
-th=param*m;    
+th = param*m;
 end

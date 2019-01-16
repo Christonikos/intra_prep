@@ -36,7 +36,7 @@ disp([newline '---------- Loading raw data -------------' ...
     'Datatype           : ' args.settings.datatype '.' newline ...
     newline   '-----------------------------------------'])
 
-raw_data = []; labels = {};
+raw_data = []; 
 % switch datatype
 switch args.settings.datatype
     case 'Blackrock'
@@ -59,7 +59,6 @@ switch args.settings.datatype
                     end
             end
             ns3_files{file_id} = data;
-            lab_files{file_id} = {NS3.ElectrodesInfo.Label}';
             % release memory
             clear data files files_len
         end
@@ -81,16 +80,19 @@ switch args.settings.datatype
         raw_data = [double(ns3_files{1}(1:end-1,:)); double(ns3_files{2})];
         % release RAM 
         clear ns3_files
-        labels   = [lab_files{1}(1:end-1,:); lab_files{2}];
-       
+        
+        % load the file that contain the probe information
+        files = dir(fullfile(args.settings.path2rawdata, '*elecs*'));
+        if isempty(files); error('probe names file not found!');end
+        labels = strtrim(string(importdata(fullfile(args.settings.path2rawdata,files.name))));
+        labels = strrep( labels,'"','');
+        
         % get the sampling rate from the recording system :
         args.params.srate = NS3.MetaTags.SamplingFreq;
         
         %% ----------- Output checks ----------- %%
         % 1 : dimensions of raw_data
-        if ~(size(raw_data,2) > size(raw_data,1))
-            error('Wrong dimensions!')
-        end
+        if ~(size(raw_data,2) > size(raw_data,1)); error('Wrong dimensions!');end
         num_channels = size(raw_data,1);
         
         % 2 : Plot the trigger chans from the two boxes
