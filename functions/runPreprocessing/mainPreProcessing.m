@@ -53,8 +53,8 @@ end
 %       1 == non rejected channel.
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
-if args.preferences.hfo_detection; num_tests = 4; else num_tests = 3; end
-rejected_channels         =   true(size(raw_data,1),num_tests);
+num_tests           = 4; 
+rejected_channels   = true(size(raw_data,1),num_tests);
 
 % for debuging : select a sub-set of the data 
 n_seconds = 6e2; % 10 min

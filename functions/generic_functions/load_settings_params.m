@@ -59,7 +59,7 @@ params.hfo_detection_threshold      = 1.5;
 preferences.visualization           = false;
 preferences.down_sample_data        = true;
 preferences.filter_sub_harmonics    = false;
-preferences.hfo_detection           = false;
+
 
 %% Append to args struct:
 args.settings       = settings;
