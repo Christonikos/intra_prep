@@ -31,7 +31,7 @@ if args.preferences.down_sample_data
         num2str(sr_i) ' Hz to ' num2str(sr_f) ' Hz: ']);
     for channel = 1:(channels)
         textprogressbar(timecount(channel));
-        signal(channel,:)   = downsample(raw_data(channel,:),ratio,0); % downsample per channel
+        signal(channel,:)   = downsample(raw_data(channel,:),ratio); % downsample per channel
     end
     % update the sampling rate
     args.params.srate   = sr_f;

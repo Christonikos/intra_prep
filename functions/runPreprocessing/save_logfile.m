@@ -8,6 +8,10 @@ curr_session    = args.settings.session;
 curr_patient    = args.settings.patient;
 file_name       = fullfile(args.settings.path2deriv.preproc, ...
     join(['rejected_channels_by_tests_', curr_session,'_',curr_patient,'.txt']));
+
+% check if dir2save exists - else create it:
+dir2save = args.settings.path2deriv.preproc;
+if ~exist(string(dir2save),'dir'); mkdir(dir2save); end
 % loop through number of tests
 for t_id = 1:ntests
     if t_id ==1; p = 'w'; else p = 'a'; end         % p = permission;

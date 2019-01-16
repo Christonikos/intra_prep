@@ -1,10 +1,9 @@
 function rejected_channels = spike_detection(filtered_data, rejected_channels, args)
 
 
-
 test_number     = 2;
 % Set a threshold (in mV)
-jump_threshold  = args.params.spikingthreshold;
+jump_threshold  = args.params.spikingthreshold/args.params.srate; % [mV/sample] = [mV/sec] / [sample/sec]
 % Initialize variable to hold the channels that will be rejected
 % due to spiking activity
 channels        = size(filtered_data,1);
@@ -18,8 +17,10 @@ textprogressbar([newline 'test #2 : Channel rejection based on epileptic spiking
 % Loop through the channels and detect abrupt changes
 for chID = 1:size(filtered_data,1)
     textprogressbar(timecount(chID))
-    nr_jumps(chID) = length(find(diff(filtered_data(chID,:)) > jump_threshold));
+    nr_jumps(chID) = length(find(diff(filtered_data(chID,:)) > jump_threshold)); % Find how many jumps per sample are above threshold ([mV/sample])
 end
+
+
 
 % ---------------------- spikes per channel figure ----------------------% 
 dir2save = args.settings.path2figures;
@@ -43,18 +44,16 @@ saveas(f1, fullfile(dir2save, file_name), 'png')
 close(f1)
 % ----------------------------------------------------------------------%
 
-
 %% Only keep voltage jumps that exceed the jumping threshold
 rec_duration_sec    = floor(rec_duration/args.params.srate);
 jump_rate           = nr_jumps/rec_duration_sec;
+
+
 deviant_channels    = find(jump_rate > args.params.jump_rate_thresh);
-
-
 
 
 % Update the logical channel variable #test 2
 rejected_channels(deviant_channels , test_number) = false;
-
 disp([newline num2str(length(deviant_channels)) ' channels have been removed.'])
 
 if args.preferences.visualization
