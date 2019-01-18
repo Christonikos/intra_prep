@@ -1,11 +1,12 @@
-function [filtered_data , rejected_channels, args] = mainPreProcessing_epoch(epoched_data, labels, args)
+function rejected_epochs = mainPreProcessing_epoch(epochs, args)
 % This is the main function of the pre-processing pipeline at the epoch level. It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
 %    INPUTS :          
-%                       1. epoched_data         : Matrix -  Data in format [channels x epochs x time]. Within the UNICOG pipeline, this
-%                                                           variable has been created using the function load_epoched_data. 
-%
+%                       1. epochs               : Cell   -  [number of blocks x 2]. 
+%                                                           1st col: The loaded data file.
+%                                                           2nd col: Information on the epoching method.
+%                                       
 %
 %                       2. args                 : Struct -  The main configuration
 %                                                           struct constructed
@@ -58,7 +59,7 @@ pTS = globalVar.pathological_event_bipolar_montage;
 
 %% VIZUALIZE REJECTED EPOCHS %% 
 if args.preferences.visualization
-    plot_bad_channels(filtered_data, rejected_channels);
+    plot_bad_channels(filtered_data, rejected_epochs);
 end
 
 
