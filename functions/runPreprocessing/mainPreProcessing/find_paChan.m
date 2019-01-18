@@ -78,11 +78,10 @@ event.timestamp = T(I,:); % C : sort by sample point
 [alligned,allignedIndex,K] = getaligneddata(eeg_bi,event.timestamp(:,1),[-150 150]);
 event.timestamp=event.timestamp(logical(K),:);
 ttlN = size(alligned,3);
-for i = 1:ttlN
-    event.data(:,1,i) = alligned(:,event.timestamp(i,2),i);%raw segment
-    event.data(:,2,i) = input_filtered(allignedIndex(i,:),...
-        event.timestamp(i,2))*1000;%filtered segment
-    event.data(:,3,i) = allignedIndex(i,:);%index
+for i = 1:ttlN % C : loop through event peaks
+    event.data(:,1,i) = alligned(:,event.timestamp(i,2),i); %raw segment
+    event.data(:,2,i) = input_filtered(allignedIndex(i,:), event.timestamp(i,2))*1000; %filtered segment
+    event.data(:,3,i) = allignedIndex(i,:); %index
 end
 atf_ind = find(eliminate_noise(event.data,fs));
 event.data(:,:,atf_ind) = [];

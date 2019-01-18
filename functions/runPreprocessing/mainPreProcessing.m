@@ -71,9 +71,6 @@ clear raw_data
 %% Linear detrending
 filtered_data = data_detrending(filtered_data);
 
-
-
-
 %% ---------------------------------  TEST 1 - VARIANCE THRESHOLDING --------------------------------------- %%
 %    Removal of channels based on the variance of the raw power.
 %    This TEST will track all the channels where the broadband

@@ -23,8 +23,7 @@ end
 index=sort([find(data>th);find(data<-th)]); % C: get samples that exceed the abs value of the threshold 
 % which was set in the previous function to be 5 times the median of the temporal variance. 
 r_ind=[find(data(index)>reject*th);find(data(index)<(-reject*th))]; % C : find the sample points that exceed the reject*thr, that is
-% 5*5thr = 15 times the median of the temporal variance. - This does not
-% look to appear anywhere else. 
+% 5*5thr = 15 times the median of the temporal variance.
 if ~isempty(r_ind)
      index(r_ind)=[];
 end
@@ -36,8 +35,7 @@ count=0;
 if li==0 || li==1
     get_idx=[];
 else   
-    F=find(diff(index)<=100); % Chris : I guess in samples. find sample points that don't have distance greater than 100
-    %F=find(diff(index)<=50); (I guess to identify a single event)
+    F=find(diff(index)<=100); % Chris : I guess in samples. find sample points that don't pass the 100mv barrier of the events that exceed 5*the median variance
     if ~isempty(F)
         if length(F)==1
             group{1}=index(F:F+1);
@@ -60,7 +58,7 @@ else
                 end
             end
         end
-         atf=zeros(length(group),1); % C : the length of the group is the events that exceeded 5times the threshold
+         atf=zeros(length(group),1); % C : the length of the group is the events that exceeded the threshold
         if th_type==1
             for i=1:length(group) 
                 % C : if you have too big or too small events, set them to

@@ -75,6 +75,7 @@ switch args.settings.datatype
         % get the trigger channels from the two boxes
         trig_ch_1 = ns3_files{1}(end,:);
         trig_ch_2 = ns3_files{2}(end,:);
+                
         % concatenate the two files into a single variable
         % excluding the first trigger channel & convert to double.
         raw_data = [double(ns3_files{1}(1:end-1,:)); double(ns3_files{2})];

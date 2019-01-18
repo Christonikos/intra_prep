@@ -1,5 +1,5 @@
-function [filtered_data , rejected_channels, args] = mainPreProcessing(raw_data, labels, args)
-% This is the main function of the pre-processing pipeline.  It is a modified pipeline based on
+function [filtered_data , rejected_channels, args] = mainPreProcessing_channel(raw_data, labels, args)
+% This is the main function of the pre-processing pipeline at the channel level. It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
 %    INPUTS :          
@@ -37,7 +37,6 @@ function [filtered_data , rejected_channels, args] = mainPreProcessing(raw_data,
 %
 % Written by : Christos Nikolaos Zacharopoulos and Yair Lakretz @UNICOG 2018.
 % ------------------------------------------------------------------------------------------------------------------%
-
 %% Input checks :
 if ~size(raw_data,2) > size(raw_data,1)
     try
@@ -47,14 +46,17 @@ if ~size(raw_data,2) > size(raw_data,1)
         return;
     end
 end
-
 %% Variables initialization
 % Create a channel log-file. This will be a logical array where :
 %       1 == non rejected channel.
 %       0 == rejected channel.
 % Initialize a logical array where we assume all channels to be 1.
-if args.preferences.hfo_detection; num_tests = 4; else num_tests = 3; end
-rejected_channels         =   true(size(raw_data,1),num_tests);
+num_tests           = 4; 
+rejected_channels   = true(size(raw_data,1),num_tests);
+
+% for debuging : select a sub-set of the data 
+n_seconds = 6e2; % 10 min
+raw_data = raw_data(:,1:args.params.srate*n_seconds);
 
 %% Filtering and downsampling
 [filtered_data, args]    =   filter_linenoise(raw_data, args);
@@ -63,15 +65,8 @@ rejected_channels         =   true(size(raw_data,1),num_tests);
 % 2. Downsampled to the specified ratio.
 % release RAM 
 clear raw_data
-
 %% Linear detrending
 filtered_data = data_detrending(filtered_data);
-
-% for debuging : select a sub-set of the data 
-n_seconds = 6e2; % 10 min
-filtered_data = filtered_data(:,1:args.params.srate*n_seconds);
-
-
 %% ---------------------------------  TEST 1 - VARIANCE THRESHOLDING --------------------------------------- %%
 %    Removal of channels based on the variance of the raw power.
 %    This TEST will track all the channels where the broadband

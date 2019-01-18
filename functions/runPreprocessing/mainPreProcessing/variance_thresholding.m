@@ -37,32 +37,16 @@ switch args.preferences.visualization
     case false
         f1 = figure('Color',[1 1 1],'visible','off');
 end
-% channels above the median threshold
-subplot(211)
-bar(dataVariance)
+bar(dataVariance); set(gca,'yscale','log')
 grid on
 grid minor
 xlabel('channels')
-ylabel('detected variance')
+ylabel('detected variance (log)')
 title('Detected variance for all channels')
 hold on
-plot([get(gca,'xlim')],[medianthreshold*median(dataVariance),medianthreshold*median(dataVariance)],'r','linew',1.2)
+plot([get(gca,'xlim')],[medianthreshold*median(dataVariance),medianthreshold*median(dataVariance)],'r','linew',2)
 hold on
-plot([get(gca,'xlim')],[median(dataVariance)/medianthreshold,median(dataVariance)/medianthreshold],'m','linew',1.2)
-legend('detected variance',[num2str(medianthreshold) '*median'],['median/' num2str(medianthreshold)],'Location',  'northeastoutside')
-% channels below the median threshold
-subplot(212)
-bar(dataVariance)
-grid on
-grid minor
-xlabel('channels')
-ylabel('detected variance')
-title('Detected variance for all channels')
-xlim([0 20])
-hold on
-plot([get(gca,'xlim')],[medianthreshold*median(dataVariance),medianthreshold*median(dataVariance)],'r','linew',1.2)
-hold on
-plot([get(gca,'xlim')],[median(dataVariance)/medianthreshold,median(dataVariance)/medianthreshold],'m','linew',1.2)
+plot([get(gca,'xlim')],[median(dataVariance)/medianthreshold,median(dataVariance)/medianthreshold],'k','linew',2)
 legend('detected variance',[num2str(medianthreshold) '*median'],['median/' num2str(medianthreshold)],'Location',  'northeastoutside')
 switch args.preferences.visualization
     case true
