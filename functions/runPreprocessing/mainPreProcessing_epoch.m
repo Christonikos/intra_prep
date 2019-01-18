@@ -34,16 +34,9 @@ function rejected_epochs = mainPreProcessing_epoch(epochs, args)
 %                       3. args             : Struct - In case of downsampling, we have 
 %                                                      an updated sampling rate.
 % -------------------------------------------------------------------------------------------------------------  
-
 %% Input checks :
-if ~size(raw_data,2) > size(raw_data,1)
-    try
-        raw_data = raw_data';
-    catch 
-        disp([newline 'Please transpose your input data before continuing'])
-        return;
-    end
-end
+if isempty(epochs); error('empty input!');end
+
 num_tests           = 4;
 %% Get HFO bad trials:
 %% ----------------------- TEST 1 - Reject based on spikes on the presence of HFOs --------------------------------------- %%
