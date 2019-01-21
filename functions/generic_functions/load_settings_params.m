@@ -14,23 +14,25 @@ function args = load_settings_params(P)
 %% -------- Default arguments -------- %%
 P = parsePairs(P); % Parse varargin
 checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
+checkField(P,'project' ,'NeuroSyntax2');
 checkField(P,'hospital' ,'Houston');
 checkField(P,'patient'  ,'TS096');
 checkField(P,'datatype' ,'Blackrock');
 checkField(P,'session'  ,'s1')
-checkField(P,'cleaning_level','channel');% epoch/channel
+checkField(P,'cleaning_level','epoch');% epoch/channel
 
 %% General settings:
-settings.path2rawdata       = fullfile(P.root_path,'Data', 'Raw', P.hospital , P.patient, P.session, filesep);                      % Path to raw-data folder.
-settings.path2deriv.power   = fullfile(P.root_path,'Data','derivatives','power', P.hospital , P.patient, P.session, filesep);       % Path to power derivative.
-settings.path2deriv.preproc = fullfile(P.root_path,'Data','derivatives','preproc', P.hospital , P.patient, P.session, filesep);     % Path to pre-processed data.
-settings.path2epoched_data  = fullfile(P.root_path,'Data', 'derivatives','epochs', P.hospital , P.patient, P.session, filesep);     % Path to the epoched-data folder.
-settings.path2figures       = fullfile(P.root_path,'Figures',P.hospital , P.patient, P.session, filesep);                           % Path to Figures folder.
-settings.path2output        = fullfile(P.root_path,'Output', P.hospital , P.patient, P.session, filesep);                           % Path to output folder.
-
+settings.path2rawdata           = fullfile(P.root_path,'Data', 'Raw', P.hospital , P.patient, P.session, filesep);                      % Path to raw-data folder.
+settings.path2deriv.power       = fullfile(P.root_path,'Data','derivatives','power', P.hospital , P.patient, P.session, filesep);       % Path to power derivative.
+settings.path2deriv.preproc     = fullfile(P.root_path,'Data','derivatives','preproc', P.hospital , P.patient, P.session, filesep);     % Path to pre-processed data.
+settings.path2epoched_data      = fullfile(P.root_path,'Data', 'derivatives','epochs', P.hospital , P.patient, P.session, filesep);     % Path to the epoched-data folder.
+settings.path2figures           = fullfile(P.root_path,'Figures',P.hospital , P.patient, P.session, filesep);                           % Path to Figures folder.
+settings.path2output            = fullfile(P.root_path,'Output', P.hospital , P.patient, P.session, filesep);                           % Path to output folder.
+settings.path2behavioral_files  = fullfile(settings.path2rawdata,'behavioral_files');                                                   % Path to the behavioral files.
 
 % Append info to settings object:
 settings.root_path  =    P.root_path;
+settings.project    =    P.project;
 settings.hospital   =    P.hospital;
 settings.patient    =    P.patient;
 settings.datatype   =    P.datatype;
@@ -50,6 +52,9 @@ params.second_harmonic{2}           = params.second_harmonic{1} + 2;
 params.third_harmonic{1}            = 179;
 params.third_harmonic{2}            = params.third_harmonic{1}  + 2;
 
+%% Set the epoching window:
+params.before_onset                 = 300;      % [ms]
+params.after_onset                  = 800;      % [ms]
 
 %% Stage 2: variance-based rejection
 params.medianthreshold              = 5;        % [var] used @stage 1
@@ -64,6 +69,7 @@ preferences.visualization           = false;
 preferences.down_sample_data        = true;
 preferences.filter_sub_harmonics    = false;
 preferences.cleaning_level          = P.cleaning_level; 
+preferences.online_epoching         = false;
 
 
 %% Append to args struct:

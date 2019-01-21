@@ -88,7 +88,7 @@ trig_ch_2 = ns3_files{2}(end,:);
 % excluding the first trigger channel & convert to double.
 raw_data = [double(ns3_files{1}(1:end-1,:)); double(ns3_files{2})];
 % release RAM
-clear ns3_files nfiles NS3
+clear ns3_files nfiles 
 
 % -------------------------------------------------------------------------
 %% CHECK AND CORRECT FOR ANY SYNCHRONIZATION ISSUES BETWEEN THE TTL PULSES 

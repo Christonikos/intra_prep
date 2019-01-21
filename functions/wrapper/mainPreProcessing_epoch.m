@@ -1,4 +1,4 @@
-function rejected_epochs = mainPreProcessing_epoch(epochs, args)
+function rejected_epochs = mainPreProcessing_epoch(epochs, args,behav_timevector, labels)
 % This is the main function of the pre-processing pipeline at the epoch level. It is a modified pipeline based on
 % the pipeline used at the Stanford University.
 %
@@ -19,12 +19,14 @@ function rejected_epochs = mainPreProcessing_epoch(epochs, args)
 if isempty(epochs); error('empty input!');end
 % initialization:
 num_tests           = 4;
-
 %% ----------------------- TEST 1 - Reject based  on the presence of HFOs ----------------------------------------------- %%
 % load the variable that holds the detected hfos at the channel level (see
 % test#4 @mainPreProcessing_channel) 
-hfos_evt = load_hfos_event_time(args);
-[bad_epochs_HFO, bad_indices_HFO] = exclude_trial(pTS.ts,pTS.channel, lockevent, globalVar.channame, epoch_params.bef_time, epoch_params.aft_time, globalVar.iEEG_rate);
+[hfos_evtime, hfos_channels] = load_hfos_event_time(args);
+lockevent                    = behav_timevector{1}(:,1); 
+hfos_channels                = num2cell(hfos_channels);
+
+[bad_epochs_HFO, bad_indices_HFO] = exclude_trial(hfos_evtime,hfos_channels, lockevent, labels, params.before_onset , params.after_onset , args.params.srate);
 %% ----------------------- TEST 2 - Reject based on spikes in LF and HF components of signal ----------------------------- %%
 [be.bad_epochs_raw_LFspike, filtered_beh,spkevtind,spkts_raw_LFspike] = LBCN_filt_bad_trial(data_CAR.wave',data_CAR.fsample);
 %% ----------------------- TEST 3 - Reject based on outliers of the raw signal and jumps --------------------------------- %%

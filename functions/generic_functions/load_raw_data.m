@@ -44,21 +44,12 @@ switch args.settings.datatype
         % load the Blackrock data and perform sanity checks on the time
         % differences between the recording boxes. 
         [raw_data, num_channels, args] = load_blackrock_data(args);
-        
         % load the file that contains the probe information
         files = dir(fullfile(args.settings.path2rawdata, '*elecs*'));
         if isempty(files); error('probe names file not found!');end
         labels = strtrim(string(importdata(fullfile(args.settings.path2rawdata,files.name))));
         labels = strrep( labels,'"','');
-        
 
-        
-        
-        
-        
-        
-
-        
     case 'Neuralynx'
         ncs_files = dir(fullfile(args.settings.path2rawdata, '*.ncs'));
         num_channels=0;

@@ -1,4 +1,4 @@
-function hfos_evt = load_hfos_event_time(args)
+function [hfos_evtime, hfos_channels] = load_hfos_event_time(args)
 % Load the .csv array that contains the event time of the amplitude peak 
 % that corresponds to an HFO. This is created using test#4
 % @the mainPreProcessing_channel function.
@@ -22,4 +22,7 @@ if isempty(nfiles) || numel(nfiles)>1
     error('Input error - check the folder that contains the saved file.')
 end
 % load the file
-hfos_evt = csvread(fullfile(join([path2index,filesep,nfiles.name])));
+hfos = csvread(fullfile(join([path2index,filesep,nfiles.name])));
+
+hfos_evtime   = hfos(:,1);
+hfos_channels = hfos(:,2);
