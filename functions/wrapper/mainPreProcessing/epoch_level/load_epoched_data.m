@@ -3,16 +3,19 @@
 % variable into a common format. 
 %
 % INPUTS  : 
-%           1. args - Struct : The configuration struct that holds 
+%           1. args     - Struct : The configuration struct that holds 
 %                              the settings, params and preferences.
 % OUTPUTS :
 %
-%           1. epochs - Cell : [number of blocks x 2]. 
+%           1. epochs   - Cell : [number of blocks x 2]. 
 %                              1st col: The loaded data file.
 %                              2nd col: Information on the epoching 
 %                                       method.
+%           2. channels - Double : The number of channels without any
+%                                  rereferencing. 
+%           
 %------------------------------------------------------------------
-function epochs = load_epoched_data(args)
+function [epochs, channels, onset_timestamp] = load_epoched_data(args)
 disp([newline '-------- Loading epoched data -----------' ...
     newline newline ...
     'Patient            : ' args.settings.patient  '.' newline ...

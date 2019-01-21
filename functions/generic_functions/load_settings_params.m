@@ -18,7 +18,7 @@ checkField(P,'hospital' ,'Houston');
 checkField(P,'patient'  ,'TS096');
 checkField(P,'datatype' ,'Blackrock');
 checkField(P,'session'  ,'s1')
-checkField(P,'cleaning_level','epoch');% epoch/channel
+checkField(P,'cleaning_level','channel');% epoch/channel
 
 %% General settings:
 settings.path2rawdata       = fullfile(P.root_path,'Data', 'Raw', P.hospital , P.patient, P.session, filesep);                      % Path to raw-data folder.

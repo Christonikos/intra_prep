@@ -25,13 +25,15 @@ addpath(genpath(fullfile(pwd,'functions')));
 %% -----------  LOAD PARAMETERS ----------- %
 % load settings and parameters
 args = load_settings_params(varargin);
+%% -----------  LOAD RAW DATA ----------- %
+% load the raw data : matrix of dimensions : [channels x time].
+[raw_data, labels, channels]   = load_raw_data(args);
+fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
+
+
 % switch cleaning level
 switch args.preferences.cleaning_level
     case 'channel'
-        %% -----------  LOAD RAW DATA ----------- %
-        % load the raw data : matrix of dimensions : [channels x time].
-        [raw_data, labels, channels]   = load_raw_data(args);
-        fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
         %% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
         [filtered_data , rejected_channels, args] = mainPreProcessing_channel(raw_data, labels, args);
         clear raw_data % release RAM

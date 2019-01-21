@@ -47,21 +47,7 @@ end
 % release RAM
 clear raw_data textprogressbar
 
-% Blackrock specific case - (trigger channel included @the dataset).
-% Save the trigger channel after downsampling (if selected) @path2preproc.
-curr_datatype = args.settings.datatype;
-if strcmp(curr_datatype,'Blackrock')
-    curr_session = args.settings.session;
-    curr_patient = args.settings.patient;
-    trig_ch      = filtered_data(end,:);
-    % check if dir exists - else create 
-    dir2save = args.settings.path2deriv.preproc;
-    if ~exist(string(dir2save),'dir'); mkdir(dir2save); end
-    % save the triggers of the second box as a .csv file
-    file_name       = fullfile(dir2save, ...
-        join(['trigger_channel_sr',num2str(args.params.srate),'_',curr_session,'_',curr_patient,'.csv']));
-    csvwrite(file_name,trig_ch);
-end
+
 
 %% ----------- FILTERING ----------- %%
 line_noise      = num2str(args.params.first_harmonic{1} +1);
