@@ -13,43 +13,44 @@ function args = load_settings_params(P)
 
 %% -------- Default arguments -------- %%
 P = parsePairs(P); % Parse varargin
-checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
-checkField(P,'project' ,'NeuroSyntax2');
-checkField(P,'hospital' ,'Houston');
-checkField(P,'patient'  ,'TS096');
-checkField(P,'datatype' ,'Blackrock');
-checkField(P,'session'  ,'s1')
-checkField(P,'cleaning_level','epoch');% epoch/channel
+%checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
+checkField(P,'root_path', fullfile(filesep, 'home','neuro', 'Documents', 'Marseille_Jab'));
+checkField(P,'project' ,'Marseille_Jab');
+checkField(P,'patient'  ,'JA_P02');
+checkField(P,'datatype' ,'Neuroscan');
+checkField(P,'session'  ,'ses-01');
+checkField(P,'modality', 'ieeg');
 
 %% General settings:
-settings.path2rawdata           = fullfile(P.root_path,'Data', 'Raw', P.hospital , P.patient, P.session, filesep);                      % Path to raw-data folder.
-settings.path2deriv.power       = fullfile(P.root_path,'Data','derivatives','power', P.hospital , P.patient, P.session, filesep);       % Path to power derivative.
-settings.path2deriv.preproc     = fullfile(P.root_path,'Data','derivatives','preproc', P.hospital , P.patient, P.session, filesep);     % Path to pre-processed data.
-settings.path2epoched_data      = fullfile(P.root_path,'Data', 'derivatives','epochs', P.hospital , P.patient, P.session, filesep);     % Path to the epoched-data folder.
-settings.path2figures           = fullfile(P.root_path,'Figures',P.hospital , P.patient, P.session, filesep);                           % Path to Figures folder.
-settings.path2output            = fullfile(P.root_path,'Output', P.hospital , P.patient, P.session, filesep);                           % Path to output folder.
-settings.path2behavioral_files  = fullfile(settings.path2rawdata,'behavioral_files');                                                   % Path to the behavioral files.
+% --INPUT--
+settings.path2rawdata           = fullfile(P.root_path,'Data',  P.patient, P.session, P.modality, filesep);  				                    % Path to raw-data folder.
+% --OUTPUT--
+settings.path2deriv.power       = fullfile(P.root_path,'Data','Derivatives','Power', P.patient, P.session, filesep);       % Path to power derivative.
+settings.path2deriv.preproc     = fullfile(P.root_path,'Data','Derivatives','Preproc', P.patient, P.session, filesep);     % Path to pre-processed data.
+settings.path2epoched_data      = fullfile(P.root_path,'Data', 'Derivatives','Epochs', P.patient, P.session, filesep);     % Path to the epoched-data folder.
+settings.path2figures           = fullfile(P.root_path,'Figures', P.patient, P.session, filesep);                          % Path to Figures folder.
+settings.path2output            = fullfile(P.root_path,'Output', P.patient, P.session, filesep);                           % Path to output folder.
+settings.path2behavioral_files  = fullfile(settings.path2rawdata,'Behavioral_files');                                      % Path to the behavioral files.
 
 % Append info to settings object:
 settings.root_path  =    P.root_path;
 settings.project    =    P.project;
-settings.hospital   =    P.hospital;
 settings.patient    =    P.patient;
 settings.datatype   =    P.datatype;
 settings.session    =    P.session;
 
 %% General parameters:
 params.downsampling_ratio           = 4; % integer: Decrease the sampling rate of a sequence by n.
-params.srate                        = 2000;
+params.srate                        = 2500;
 
 %% Stage 1: line filtering (set the notch-filtering bandwidth)
-params.first_harmonic{1}            = 59;
+params.first_harmonic{1}            = 49;
 params.first_harmonic{2}            = params.first_harmonic{1}  + 2;
-params.first_sub_harmonic{1}        = 90;  % Apply only if preference.filter_sub_harmonics is set to True
+params.first_sub_harmonic{1}        = 99;  % Apply only if preference.filter_sub_harmonics is set to True
 params.first_sub_harmonic{2}        = params.first_sub_harmonic{1} + 2;
-params.second_harmonic{1}           = 119;
+params.second_harmonic{1}           = 149;
 params.second_harmonic{2}           = params.second_harmonic{1} + 2;
-params.third_harmonic{1}            = 179;
+params.third_harmonic{1}            = 199;
 params.third_harmonic{2}            = params.third_harmonic{1}  + 2;
 
 %% Set the epoching window:
@@ -57,19 +58,17 @@ params.before_onset                 = 300;      % [ms]
 params.after_onset                  = 800;      % [ms]
 
 %% Stage 2: variance-based rejection
-params.medianthreshold              = 5;        % [var] used @stage 1
+params.medianthreshold              = 6;        % [var] used @stage 1
 params.spikingthreshold             = 1e5;      % [mV/second]  used @stage 2
 %% Stage 3: spike detection
-params.jump_rate_thresh             = 1;        % [Hz] For spike detection (stage 3): maximal number of jumps allowed per sec.
+params.jump_rate_thresh             = .1;        % [Hz] For spike detection (stage 3): maximal number of jumps allowed per sec.
 %% Stage 4 : HFOs detection 
 params.hfo_detection_threshold      = 1.5;      % ratio used @stage 4 (HFO detection)
 
 %% Preferences
-preferences.visualization           = false;
+preferences.visualization           = true;
 preferences.down_sample_data        = true;
-preferences.filter_sub_harmonics    = false;
-preferences.cleaning_level          = P.cleaning_level; 
-preferences.online_epoching         = false;
+preferences.filter_sub_harmonics    = true;
 
 
 %% Append to args struct:

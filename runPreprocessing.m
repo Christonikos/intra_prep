@@ -17,45 +17,29 @@ clearvars -except varargin; clc; close all;
 %Check whether the debug mode is on
 if feature('IsDebugMode')
     dbquit all
+    dbstop if error
 end
-dbstop if error
+
 % Add the dependencies to the path.
 addpath(genpath(fullfile(pwd,'functions')));
 %% -----------  LOAD PARAMETERS ----------- %
 % load settings and parameters
 args = load_settings_params(varargin);
-% switch cleaning level
-switch args.preferences.cleaning_level
-    case 'channel'
-        %% -----------  LOAD RAW DATA ----------- %
-        % load the raw data : matrix of dimensions : [channels x time].
-        [raw_data, labels, channels]   = load_raw_data(args);
-        fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
-        %% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
-        [filtered_data , rejected_channels, args] = mainPreProcessing_channel(raw_data, labels, args);
-        clear raw_data % release RAM
-        %% -----------  SAVE DATA AND LOG-FILE ------------------ %
-        % save channel log-file to output folder
-        save_logfile(rejected_channels, args)
-        % save filtered data to output folder
-        save_channels(filtered_data, args)
-    case 'epoch'
-        % switch between online and offline epoching
-        switch args.preferences.online_epoching
-            case true
-                %% -----------  LOAD RAW DATA ----------- %
-                % load the raw data : matrix of dimensions : [channels x time].
-                [raw_data, labels, channels]   = load_raw_data(args);
-                fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
-                %% -----------  EPOCH RAW DATA ----------- %
-                epochs = epoch_raw_data(raw_data,args);
-            case false
-                %% -----------  LOAD EPOCHED DATA ----------- %
-                [epochs, behav_timevector, labels] = load_epoched_data(args);
-        end
-        
-        %% -----------  MAIN  EPOCH REJECTION ANALYSIS----------- %
-        rejected_epochs = mainPreProcessing_epoch(epochs, args, behav_timevector, labels);
+%% -----------  LOAD RAW DATA ----------- %
+% load the raw data : matrix of dimensions : [channels x time].
+[raw_data, labels, channels]   = load_raw_data(args);
+fprintf('Raw files were loaded into matlab (#channels = %d)\n', channels)
+%% -----------  MAIN  CHANNEL REJECTION ANALYSIS----------- %
+[filtered_data , rejected_channels, args] = mainPreProcessing_channel(raw_data, labels, args);
+clear raw_data % release RAM
+%% -----------  SAVE DATA AND LOG-FILE ------------------ %
+% save channel log-file to output folder
+save_logfile(rejected_channels, args)
+% save filtered data to output folder
+save_channels(filtered_data, args)
+
+%% -----------  MAIN  EPOCH REJECTION ANALYSIS----------- %
+rejected_epochs = mainPreProcessing_epoch(epochs, args, behav_timevector, labels);
 end
 
 

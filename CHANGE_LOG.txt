@@ -1,0 +1,4 @@
+1. Remove the P.Hospital from the code and the directories
+2. Changed the root dir to: PROJECT/DATA(*)/SUBJECT/SESSION/MODALITY(iEEG &/or MEG)
+3. Agreed on Camel-casing the directory names.
+4. Removed the cleaning level from the pipeline

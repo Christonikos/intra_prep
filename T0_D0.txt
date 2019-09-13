@@ -1,0 +1,2 @@
+1. Check BIDS compatibility 
+2. Write a new, more user friendly readme

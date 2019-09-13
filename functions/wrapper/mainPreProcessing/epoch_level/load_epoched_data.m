@@ -29,6 +29,8 @@ disp([newline '-------- Loading epoched data -----------' ...
 % List the available files per session (irrelevant of stored datatype)
 nfiles = dir(fullfile(args.settings.path2epoched_data));
 % clear directorie entries if UNIX
+args.settings.path2epoched_data
+
 if isunix; nfiles(1:2) = []; end
 % initialize cell to hold epochs
 user_epochs = cell(numel(nfiles));
@@ -42,7 +44,7 @@ for file_id = 1:numel(nfiles)
     % get information on the stored variables without loading anything
     file_name = fullfile(join([args.settings.path2epoched_data,filesep,nfiles(file_id).name]));
     % check if we have a .mat file
-    if endsWith(file_name,'.mat'); files{file_id} = matfile(file_name); end
+    if endsWith(file_name,'.mat'); files{file_id} = matfile(file_name); else continue; end
     v = whos(files{file_id});
     % get the workspace variable name
     varname = v.name;
@@ -56,6 +58,9 @@ for file_id = 1:numel(nfiles)
             user_epochs{file_id,2} = 'fieldtrip';
         else
             user_epochs{file_id,2} = 'other';
+
+        
+        
         end
     end
     user_epochs{file_id,1} = T.(varname); % store user's var to the user_epochs var.

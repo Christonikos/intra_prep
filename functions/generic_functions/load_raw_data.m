@@ -22,7 +22,7 @@
 %                   3. num_channels     : Double  -   Number of channels used in the current raw file.
 %
 %                   4. args             : Struct  -   In the cases of
-%                                                     "Blackorock" and "NihonKohden" datatypes, we update the
+%                                                     "Blackrock" and "NihonKohden" datatypes, we update the
 %                                                     field params.srate with the srate provided by the
 %                                                     recording system.
 
@@ -32,7 +32,6 @@ function [raw_data, labels, num_channels, args] = load_raw_data(args)
 disp([newline '---------- Loading raw data -------------' ...
     newline newline ...
     'Patient            : ' args.settings.patient  '.' newline ...
-    'Hospital           : ' args.settings.hospital '.' newline ...
     'Datatype           : ' args.settings.datatype '.' newline ...
     newline   '-----------------------------------------'])
 
@@ -53,7 +52,7 @@ switch args.settings.datatype
     case 'Neuralynx'
         ncs_files = dir(fullfile(args.settings.path2rawdata, '*.ncs'));
         num_channels=0;
-        for ncs_file_name=ncs_files'
+        for ncs_file_name=ncs_files
             num_channels = num_channels+1;
             file_name = ncs_file_name.name;
             ncs_file = fullfile(args.settings.path2rawdata,file_name);
@@ -76,4 +75,19 @@ switch args.settings.datatype
             labels   = [hdr{file_id}.label'];
         end
         num_channels = hdr{file_id}.ns;
+        
+    case 'Neuroscan'
+        addpath('/home/neuro/Documents/MATLAB/Toolbox/filedtrip/fieldtrip-20190912')
+        nfiles = dir(fullfile(args.settings.path2rawdata, '*.eeg'));
+        raw_data = []; labels = []; data = {};
+        for file_id = 1:numel(nfiles)
+            cfg = [];
+            cfg.dataset = fullfile(args.settings.path2rawdata,nfiles(file_id).name);
+            % Only working for one file only at the moment
+            dataInfo = ft_preprocessing(cfg);
+            raw_data = dataInfo.trial{1};  
+        end
+       labels       = dataInfo.label; 
+       num_channels = numel(labels);
+       args.srate   = dataInfo.fsample;
 end
