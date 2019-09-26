@@ -71,13 +71,13 @@ filtered_data = data_detrending(filtered_data);
 %    Removal of channels based on the variance of the raw power.
 %    This TEST will track all the channels where the broadband
 %    signal exceeds an upper and lower threshold of variance.
-rejected_channels  =   variance_thresholding(filtered_data, rejected_channels, args);
+% rejected_channels  =   variance_thresholding(filtered_data, rejected_channels, args);
 %%  --------------------------------- TEST 2 - SPIKES DETECTION -------------------------------------------- %%
 % Remove channels based on the spikes in the raw signal
 % Detect abnormalities (spikes) in the raw signal. 
-rejected_channels  =   spike_detection(filtered_data,rejected_channels, args);
+% rejected_channels  =   spike_detection(filtered_data,rejected_channels, args);
 %%  --------------------------------- TEST 3 - REJECTION BASED ON FREQUENCY CONTENT ------------------------ %%
-rejected_channels  =   rejection_based_on_powerspectrum(filtered_data, rejected_channels, args);
+% rejected_channels  =   rejection_based_on_powerspectrum(filtered_data, rejected_channels, args);
 %%  --------------------------------  TEST 4 - REJECTION BASED ON HFOs ------------------------------------- %%
 % Remove channels based on the presence of HFOs.
 rejected_channels  = rejection_based_on_hfos(filtered_data,labels, rejected_channels, args);

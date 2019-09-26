@@ -16,7 +16,7 @@ P = parsePairs(P); % Parse varargin
 %checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
 checkField(P,'root_path', fullfile(filesep, 'home','neuro', 'Documents', 'Marseille_Jab'));
 checkField(P,'project' ,'Marseille_Jab');
-checkField(P,'patient'  ,'JA_P02');
+checkField(P,'patient'  ,'JAP02');
 checkField(P,'datatype' ,'Neuroscan');
 checkField(P,'session'  ,'ses-01');
 checkField(P,'modality', 'ieeg');

@@ -79,6 +79,10 @@ switch args.settings.datatype
     case 'Neuroscan'
         addpath('/home/neuro/Documents/MATLAB/Toolbox/filedtrip/fieldtrip-20190912')
         nfiles = dir(fullfile(args.settings.path2rawdata, '*.eeg'));
+        if any( structfun(@isempty, nfiles) )
+            error('FileNotFound')
+        end
+        
         raw_data = []; labels = []; data = {};
         for file_id = 1:numel(nfiles)
             cfg = [];
