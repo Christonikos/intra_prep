@@ -38,10 +38,6 @@ save_logfile(rejected_channels, args)
 % save filtered data to output folder
 save_channels(filtered_data, args)
 
-%% -----------  MAIN  EPOCH REJECTION ANALYSIS----------- %
-rejected_epochs = mainPreProcessing_epoch(epochs, args, behav_timevector, labels);
-end
-
 
 
 

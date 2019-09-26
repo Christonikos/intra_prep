@@ -2,3 +2,5 @@
 2. Changed the root dir to: PROJECT/DATA(*)/SUBJECT/SESSION/MODALITY(iEEG &/or MEG)
 3. Agreed on Camel-casing the directory names.
 4. Removed the cleaning level from the pipeline
+5. Removed the "epoch" level  - Christos
+6. Cleaned the directory -- Christos
