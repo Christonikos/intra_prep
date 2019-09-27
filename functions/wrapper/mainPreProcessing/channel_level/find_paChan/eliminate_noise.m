@@ -1,11 +1,13 @@
 function [discard] = eliminate_noise(data,fs)
 %   Eliminate noise after initial detection
 %   Su Liu
+
 candidate = cell(1,size(data,3));
 pre  = 127*(fs/1000);
 post = 128*(fs/1000);
 ind  = round(size(data,1)/2-pre):round(size(data,1)/2+post);
 ld   = length(ind);
+
 for i = 1:size(data,3)
     candidate{i}(:,1) = data(ind,1,i);
     candidate{i}(:,2) = data(ind,2,i);

@@ -77,9 +77,9 @@ switch args.settings.datatype
         num_channels = hdr{file_id}.ns;
         
     case 'Neuroscan'
-        addpath('/home/neuro/Documents/MATLAB/Toolbox/filedtrip/fieldtrip-20190912')
+        addpath('/home/czacharo/Software/MATLAB/toolbox/fieldtrip-20190922')
         nfiles = dir(fullfile(args.settings.path2rawdata, '*.eeg'));
-        if any( structfun(@isempty, nfiles) )
+        if isempty(nfiles)
             error('FileNotFound')
         end
         

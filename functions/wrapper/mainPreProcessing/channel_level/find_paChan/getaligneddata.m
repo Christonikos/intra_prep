@@ -15,13 +15,13 @@ end
 q=1;
 index=index(:);
 T = length(index);
-K=zeros(T,1);
+K=zeros(T,1); % number of detected HFOs
 range=round(range);
 alligned = zeros(diff(range)+1,size(data,2),T);
 allignedIndex = zeros(T,diff(range)+1);
-for k = 1:T
-    allignedIndex(k,:)=index(k)+(range(1):range(2));
-    if ~any(allignedIndex(k,:)<=0) && ~any(allignedIndex(k,:)>length(data))
+for k = 1:T % loop over detected HFOs
+    allignedIndex(k,:)=index(k)+(range(1):range(2)); % get a time window around the HFO 
+    if ~any(allignedIndex(k,:)<=0) && ~any(allignedIndex(k,:)>length(data)) % if we get outside the recording session
         if ~any((allignedIndex(k,1)<artifact(:,2) & allignedIndex(k,1)>artifact(:,1)) | (allignedIndex(k,end)<artifact(:,2) & allignedIndex(k,end)>artifact(:,1)))               
             alligned(:,:,k) = data(allignedIndex(k,:),:);
             K(k)=1;
@@ -33,7 +33,7 @@ for k = 1:T
 end
 
 % Keeping only artifact free trials
-alligned=alligned(:,:,logical(K));
+alligned=alligned(:,:,logical(K)); % [ms, #channels, #HFOs]
 allignedIndex=allignedIndex(logical(K),:);
 %allignedIndex(del,:)=[];
 %alligned(:,:,del)=[];

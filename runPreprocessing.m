@@ -19,7 +19,7 @@ if feature('IsDebugMode')
     dbquit all
     dbstop if error
 end
-
+dbstop if error
 % Add the dependencies to the path.
 addpath(genpath(fullfile(pwd,'functions')));
 %% -----------  LOAD PARAMETERS ----------- %

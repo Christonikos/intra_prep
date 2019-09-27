@@ -14,7 +14,7 @@ function args = load_settings_params(P)
 %% -------- Default arguments -------- %%
 P = parsePairs(P); % Parse varargin
 %checkField(P,'root_path', fullfile(filesep, 'neurospin','unicog', 'protocols', 'intracranial','example_project'));
-checkField(P,'root_path', fullfile(filesep, 'home','neuro', 'Documents', 'Marseille_Jab'));
+checkField(P,'root_path', fullfile(filesep,'media','czacharo' ,'Transcend', 'Marseille_Jab'));
 checkField(P,'project' ,'Marseille_Jab');
 checkField(P,'patient'  ,'JAP02');
 checkField(P,'datatype' ,'Neuroscan');
@@ -40,7 +40,7 @@ settings.datatype   =    P.datatype;
 settings.session    =    P.session;
 
 %% General parameters:
-params.downsampling_ratio           = 4; % integer: Decrease the sampling rate of a sequence by n.
+params.downsampling_ratio           = 2; % integer: Decrease the sampling rate of a sequence by n.
 params.srate                        = 2500;
 
 %% Stage 1: line filtering (set the notch-filtering bandwidth)
@@ -66,7 +66,7 @@ params.jump_rate_thresh             = .1;        % [Hz] For spike detection (sta
 params.hfo_detection_threshold      = 1.5;      % ratio used @stage 4 (HFO detection)
 
 %% Preferences
-preferences.visualization           = true;
+preferences.visualization           = false;
 preferences.down_sample_data        = true;
 preferences.filter_sub_harmonics    = true;
 

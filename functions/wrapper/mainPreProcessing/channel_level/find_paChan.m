@@ -55,14 +55,17 @@ end
 fprintf('%s\n','---- Detecting pathological events ----');
 % Chris : flag for fs = 500 Hz.
 wn = [80 450]/(fs/2);
-if fs == 500; wn = [80 450]/(fs); end
+if fs<900
+    error('Sampling rate < 900 Hz. The sampling frequency should be at least twice the upper cuttof frequency.')
+end
+
 b = fir1(64,wn);
 a = 1;
 input_filtered = filtfilt(b,a,eeg_bi);
 n = size(input_filtered,2);
 
-
-for i = 1:n
+% loop over channels
+for i = 1:n %1:n
     [~,th] = get_threshold(input_filtered(:,i),100,50,'std',5);
     try
         timestamp{i}(:,1) = find_event(input_filtered(:,i),th,2,1);
@@ -75,8 +78,9 @@ end
 T = cat(1,timestamp{:}); % C : 1st column sample points of peaks that exceed the threshold , 2nd column = channel index
 [~,I] = sort(T(:,1)); % C : sort by channel
 event.timestamp = T(I,:); % C : sort by sample point
-[alligned,allignedIndex,K] = getaligneddata(eeg_bi,event.timestamp(:,1),[-150 150]);
-event.timestamp=event.timestamp(logical(K),:);
+[alligned,allignedIndex,K] = getaligneddata(eeg_bi,event.timestamp(:,1),[-150 150]); %alligned = epoched HFOS, allignedIndex = HFO and window around it,
+% K = HFO rejection index based on the detection time with respect to the recording duration (too early - too late)
+event.timestamp=event.timestamp(logical(K),:); % Only keep the non-borderline detected HFOS
 ttlN = size(alligned,3);
 for i = 1:ttlN % C : loop through event peaks
     event.data(:,1,i) = alligned(:,event.timestamp(i,2),i); %raw segment

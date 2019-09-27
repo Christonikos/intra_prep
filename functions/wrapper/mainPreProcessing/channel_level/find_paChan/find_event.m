@@ -1,7 +1,7 @@
 function stamp=find_event(data,th,id_type,th_type,reject)
 %  id_type 1: find the first crossing point.
-%          2: if a succesive serie of timestamps are found, get the peak.
-%          3: if a succesive serie of timestamps are found, get the
+%          2: if a succesive series of timestamps are found, get the peak.
+%          3: if a succesive series of timestamps are found, get the
 %          central point.
 %   Written by Su Liu
 if nargin<5 || isempty(reject)
@@ -23,7 +23,7 @@ end
 index=sort([find(data>th);find(data<-th)]); % C: get samples that exceed the abs value of the threshold 
 % which was set in the previous function to be 5 times the median of the temporal variance. 
 r_ind=[find(data(index)>reject*th);find(data(index)<(-reject*th))]; % C : find the sample points that exceed the reject*thr, that is
-% 5*5thr = 15 times the median of the temporal variance.
+% 5*5thr = 25 times the median of the temporal variance.
 if ~isempty(r_ind)
      index(r_ind)=[];
 end
@@ -58,7 +58,7 @@ else
                 end
             end
         end
-         atf=zeros(length(group),1); % C : the length of the group is the events that exceeded the threshold
+         atf=zeros(length(group),1); % C : the length of the group is the #events that exceeded the threshold
         if th_type==1
             for i=1:length(group) 
                 % C : if you have too big or too small events, set them to
@@ -119,5 +119,6 @@ else
 stamp=get_idx;
 end
 discard= data(stamp)>reject*th;
-stamp(discard)=[]; % C : 5th< peaks <15th? 
+stamp(discard)=[]; % C : 5th< peaks <25th?
+
 end
