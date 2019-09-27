@@ -1,0 +1,71 @@
+% Observe the statistics of the detected events in step#4. 
+% INPUT: 
+%       data = [time x trials x events]
+
+
+%% Plot Raw signal with corresponding HFOs
+clf
+for event = 1: size(data,3)
+    subplot(211)
+    plot((data(:,1,event)))
+    title('Raw')
+    ylabel('Amplitude')
+    subplot(212)
+    plot((data(:,2,event)))
+    title('HFOs')
+    ylabel('Amplitude')
+    pause()
+end
+
+%% Collect statistics for the detected events
+max_amplitude   = zeros(size(data,3),1);
+event_std       = zeros(size(data,3),1);
+event_var       = zeros(size(data,3),1);
+for event = 1: size(data,3)
+   event_std(event) =  std(abs((data(:,1,event))));
+   max_amplitude  =  max(abs((data(:,1,event))));
+   event_var(event) =  var(abs((data(:,1,event))));
+end
+
+threshold = 2;
+
+% Plot statistic distributions & scatter-plot with regression
+clf
+subplot(231)
+histogram(event_std,'Normalization','probability')
+hold on
+xline(threshold*median(event_std), '-',{[num2str(threshold),'* median','(',num2str(threshold*median(event_std)), ')']}, 'LineWidth', 4)
+title('STD')
+
+subplot(232)
+histogram(event_var,'Normalization','probability')
+hold on
+xline(threshold*median(event_var), '-',{[num2str(threshold),'* median','(',num2str(threshold*median(event_var)), ')']}, 'LineWidth', 4)
+title('VAR')
+
+subplot(233)
+histogram(max_amplitude,'Normalization','probability')
+hold on
+xline(threshold*median(max_amplitude), '-',{[num2str(threshold),'* median','(',num2str(threshold*median(max_amplitude)), ')']}, 'LineWidth', 4)
+title('MAX AMPLITUDE')
+ylim([0,1])
+
+subplot(2,3,[4:6])
+scatter(max_amplitude, event_std, 'filled')
+[P, S] = polyfit(max_amplitude,event_std,1);
+r_squared = 1 - (S.normr/norm(event_std - mean(event_std)))^2;
+yfit = P(1)*max_amplitude+P(2);
+hold on;
+plot(max_amplitude,yfit,'r-.');
+hold on;
+xline(threshold*median(max_amplitude),'LineWidth', 3);
+hold on;
+yline(threshold*median(event_std),'LineWidth', 3);
+
+grid on 
+grid minor
+axis square
+ylabel('STD')
+xlabel('Max-Amplitude')
+title(['JAP02-Ch#1-#Events= ',num2str(size(data,3))])
+legend(['r\_squared = ,', num2str(r_squared)])
