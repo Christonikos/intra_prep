@@ -1,4 +1,5 @@
 # intracranial_preprocessing
+Christos Zacharopoulos @Unicog, NeuroSpin, Paris, France
 
 This is a pipeline for preliminary cleaning of intracranial data. It applies the following steps to raw data (see methods for details):
 1. notch filtering
